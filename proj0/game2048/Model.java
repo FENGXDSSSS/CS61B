@@ -119,8 +119,7 @@ public class Model extends Observable {
                 pos = i;
             }else if (board.tile(col, i).value() == t.value() && st[col][i] == 0){
                 pos = i;
-                st[col][i] = 1;
-                score += t.value() * 2;
+
                 return pos;
             }else{
                 return pos;
@@ -142,11 +141,16 @@ public class Model extends Observable {
             for (int r = board.size() - 1; r >= 0; r--){
                 Tile t = board.tile(c, r);
                 if (board.tile(c, r) != null){
+
                     int newRow = me_is_pos(c, r, st);
+                    Tile target = board.tile(c, newRow);
+
                     if (newRow != r) {
-
+                        if (target != null && target.value() == t.value()) {
+                            st[c][newRow] = 1;
+                            score += t.value() * 2;
+                        }
                         board.move(c, newRow, t);
-
                         changed = true;
                     }
                 }
