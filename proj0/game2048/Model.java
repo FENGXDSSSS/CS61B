@@ -130,6 +130,7 @@ public class Model extends Observable {
     }
 
     public boolean tilt(Side side) {
+        board.setViewingPerspective(side);
         boolean changed;
         changed = false;
         int[][] st = new int[4][4]; // 检查此次瓦块倾斜中，某一瓦块是否为合成瓦块
@@ -151,7 +152,7 @@ public class Model extends Observable {
                 }
             }
         }
-
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
