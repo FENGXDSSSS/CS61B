@@ -106,13 +106,51 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+
+    public int me_is_pos(int col, int row, int[][] st){
+        Tile t = board.tile(col, row);
+        if (row == board.size() - 1){
+            return row;
+        }
+        int pos = row;
+        for (int i = row + 1; i < board.size(); i++){
+            //边界碰撞检测，
+            if (board.tile(col, i) == null){
+                pos = i;
+            }else if (board.tile(col, i).value() == t.value() && st[col][i] == 0){
+                pos = i;
+                st[col][i] = 1;
+                score += t.value() * 2;
+                return pos;
+            }else{
+                return pos;
+            }
+        }
+        return pos;
+    }
+
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-
+        int[][] st = new int[4][4]; // 检查此次瓦块倾斜中，某一瓦块是否为合成瓦块
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+
+        for (int c = 0; c < board.size(); c++){
+            for (int r = board.size() - 1; r >= 0; r--){
+                Tile t = board.tile(c, r);
+                if (board.tile(c, r) != null){
+                    int newRow = me_is_pos(c, r, st);
+                    if (newRow != r) {
+
+                        board.move(c, newRow, t);
+
+                        changed = true;
+                    }
+                }
+            }
+        }
 
         checkGameOver();
         if (changed) {
