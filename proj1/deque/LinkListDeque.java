@@ -96,11 +96,52 @@ public class LinkListDeque<Item> {
     }
 
     public Item get(int index){
-        if ( || size == 0){
+        if (index < 0 || size == 0 || index >= size){
             return null;
         }
+        node temp = sentinel;
+        while (index >= 0){
+            temp = temp.next;
+            index--;
+        }
+        return temp.item;
+    }
 
+//    public Iterator<Item> iterator(){
+//
+//    }
 
+    public boolean equals(Object o){
+        if (!(o instanceof LinkListDeque)){
+            return false;
+        }
+        LinkListDeque<?> other = ((LinkListDeque<?>) o);
+
+        if (this.size() != other.size()){
+            return false;
+        }
+        for (int i = 0; i < size; i++){
+            if (!this.get(i).equals(other.get(i))){
+                return false;
+            }
+        }
+
+        return true;
+    }
+    // 辅助getRecursive递归的函数。
+    public Item helpRecursive(int index, node p){
+        if (index < 0){
+            return p.item;
+        }
+        //index作为参数不用自减，不改变初值
+        return helpRecursive(index - 1, p.next);
+    }
+    // 递归get
+    public Item getRecursive(int index){
+        if (index < 0 || size == 0 || index >= size){
+            return null;
+        }
+        return helpRecursive(index, sentinel);
     }
 
     private node sentinel;
