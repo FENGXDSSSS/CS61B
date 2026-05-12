@@ -1,4 +1,5 @@
 package timingtest;
+import afu.org.checkerframework.checker.igj.qual.I;
 import edu.princeton.cs.algs4.Stopwatch;
 
 /**
@@ -23,6 +24,23 @@ public class TimeAList {
 
     public static void timeAListConstruction() {
         // TODO: YOUR CODE HERE
+        int[] arr = {1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000};
 
+        AList<Integer> ns = new AList(); // 存放测试数据
+        AList<Double> times = new AList(); // 存放调用耗时
+        AList<Integer> ops = new AList(); // 存放调用次数
+        double timesecond = 0;
+        for (int num : arr){
+            AList<Integer> nums = new AList();
+            Stopwatch sw = new Stopwatch();
+            for (int i = 0; i < num; i++){
+                nums.addLast(i);
+            }
+            timesecond = sw.elapsedTime();
+            ns.addLast(num);
+            times.addLast(timesecond);
+            ops.addLast(num);
+        }
+        printTimingTable(ns, times, ops);
     }
 }
