@@ -24,7 +24,7 @@ public class TimeAList {
 
     public static void timeAListConstruction() {
         // TODO: YOUR CODE HERE
-        int[] arr = {1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000};
+        int[] arr = {1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000, 1000000, 10000000};
 
         AList<Integer> ns = new AList(); // 存放测试数据
         AList<Double> times = new AList(); // 存放调用耗时
