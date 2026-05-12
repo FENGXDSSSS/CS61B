@@ -95,12 +95,12 @@ public class LinkListDeque<Item> {
         return temp.item;
     }
 
-    public Item get(){
-        if (size == 0){
+    public Item get(int index){
+        if ( || size == 0){
             return null;
         }
 
-        
+
     }
 
     private node sentinel;
