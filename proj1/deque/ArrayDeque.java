@@ -88,7 +88,7 @@ public class ArrayDeque<Item> {
         return temp;
     }
 
-    public Item removelast(){
+    public Item removeLast(){
         if (size == 0){
             return null;
         }
