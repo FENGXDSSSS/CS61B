@@ -93,7 +93,7 @@ public class ArrayDeque<Item> {
             return null;
         }
         if (nextback == 0){
-            nextback = arrlength + 1;
+            nextback = arrlength - 1;
         }else{
             nextback -= 1;
         }
