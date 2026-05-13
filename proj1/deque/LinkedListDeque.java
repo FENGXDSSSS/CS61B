@@ -1,6 +1,6 @@
 package deque;
 
-public class LinkListDeque<Item> {
+public class LinkedListDeque<Item> {
     private class node{
         public node(node l, Item x, node r){
             prev = l;
@@ -13,13 +13,13 @@ public class LinkListDeque<Item> {
         public node prev;
     }
     // 空链表构造
-    public LinkListDeque(){
+    public  LinkedListDeque(){
         sentinel = new node(null, null, null);
         sentinel.prev = sentinel;
         sentinel.next = sentinel;
     }
     // 赋值链表构造
-    public LinkListDeque(Item x){
+    public  LinkedListDeque(Item x){
         // 定义哨兵节点
         sentinel = new node(null, null, null);
         sentinel.prev = sentinel;
@@ -28,7 +28,6 @@ public class LinkListDeque<Item> {
         node p = new node(sentinel.next, x, sentinel);
         sentinel.next = p;
         sentinel.prev = p;
-
         size = 1;
     }
 
@@ -112,10 +111,10 @@ public class LinkListDeque<Item> {
 //    }
 
     public boolean equals(Object o){
-        if (!(o instanceof LinkListDeque)){
+        if (!(o instanceof LinkedListDeque)){
             return false;
         }
-        LinkListDeque<?> other = ((LinkListDeque<?>) o);
+        LinkedListDeque<?> other = ((LinkedListDeque<?>) o);
 
         if (this.size() != other.size()){
             return false;
