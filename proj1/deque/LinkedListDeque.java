@@ -1,7 +1,5 @@
 package deque;
 
-import deque.Deque;
-
 public class LinkedListDeque<T> implements Deque<T>{
     private class Node{
         public Node(Node l, T x, Node r){
