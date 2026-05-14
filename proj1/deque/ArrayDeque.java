@@ -2,7 +2,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Deque<T>{
+public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
     public ArrayDeque(){
         list = (T[]) new Object[8];
         size = 0;
@@ -125,12 +125,10 @@ public class ArrayDeque<T> implements Deque<T>{
         ArrayDequeIterator() {
             index = 0;
         }
-
         @Override
         public boolean hasNext() {
             return index < size;
         }
-
         @Override
         public T next() {
             T item = get(index);

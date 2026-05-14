@@ -113,12 +113,10 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T>{
         LinkedListDequeIterator() {
             p = sentinel.next;
         }
-
         @Override
         public boolean hasNext() {
             return p == sentinel;
         }
-
         @Override
         public T next() {
             T item = p.item;
