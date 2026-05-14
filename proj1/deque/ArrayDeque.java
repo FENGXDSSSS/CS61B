@@ -1,5 +1,7 @@
 package deque;
 
+import java.util.Iterator;
+
 public class ArrayDeque<T> implements Deque<T> {
     public ArrayDeque(){
         list = (T[]) new Object[8];
@@ -113,13 +115,13 @@ public class ArrayDeque<T> implements Deque<T> {
         return list[(nextfirst + 1 + index) % arrlength];
     }
 
-//    public Iterator<Item> iterator(){
-//
-//    }
+    public Iterator<T> iterator(){
+        return null;
+    }
 
-//    public boolean equals(Object o){
-//
-//    }
+    public boolean equals(Object o){
+        return false;
+    }
 
     protected T[] list;
     protected int size;
