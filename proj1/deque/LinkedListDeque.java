@@ -1,14 +1,14 @@
 package deque;
 
-public class LinkedListDeque<Item> implements Deque<Item>{
+public class LinkedListDeque<T> implements Deque<T>{
     private class node{
-        public node(node l, Item x, node r){
+        public node(node l, T x, node r){
             prev = l;
             item = x;
             next = r;
         }
 
-        public Item item;
+        public T item;
         public node next;
         public node prev;
     }
@@ -19,7 +19,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
         sentinel.next = sentinel;
     }
     // 赋值链表构造
-    public  LinkedListDeque(Item x){
+    public  LinkedListDeque(T x){
         // 定义哨兵节点
         sentinel = new node(null, null, null);
         sentinel.prev = sentinel;
@@ -32,7 +32,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     }
 
     @Override
-    public void addFirst(Item x){
+    public void addFirst(T x){
         node p = new node(sentinel, x, sentinel.next);
         sentinel.next.prev = p;
         sentinel.next = p;
@@ -41,7 +41,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     }
 
     @Override
-    public void addLast(Item x){
+    public void addLast(T x){
         node p = new node(sentinel.prev, x, sentinel);
         sentinel.prev.next = p;
         sentinel.prev = p;
@@ -65,7 +65,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     }
 
     @Override
-    public Item removeFirst(){
+    public T removeFirst(){
         if (size == 0){
             return null;
         }
@@ -79,7 +79,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     }
 
     @Override
-    public Item removeLast(){
+    public T removeLast(){
         if (size == 0){
             return null;
         }
@@ -93,7 +93,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     }
 
     @Override
-    public Item get(int index){
+    public T get(int index){
         if (index < 0 || size == 0 || index >= size){
             return null;
         }
@@ -127,7 +127,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
         return true;
     }
     // 辅助getRecursive递归的函数。
-    public Item helpRecursive(int index, node p){
+    public T helpRecursive(int index, node p){
         if (index < 0){
             return p.item;
         }
@@ -135,7 +135,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
         return helpRecursive(index - 1, p.next);
     }
     // 递归get
-    public Item getRecursive(int index){
+    public T getRecursive(int index){
         if (index < 0 || size == 0 || index >= size){
             return null;
         }

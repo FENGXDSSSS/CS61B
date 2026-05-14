@@ -1,8 +1,8 @@
 package deque;
 
-public class ArrayDeque<Item> implements Deque<Item> {
+public class ArrayDeque<T> implements Deque<T> {
     public ArrayDeque(){
-        list = (Item[]) new Object[8];
+        list = (T[]) new Object[8];
         size = 0;
         nextfirst = list.length / 2;
         nextback = list.length / 2 + 1;
@@ -10,7 +10,7 @@ public class ArrayDeque<Item> implements Deque<Item> {
     }
     // 数组扩容_居中复制
     public void resize(int capacity){
-        Item[] temp = (Item[]) new Object[capacity];
+        T[] temp = (T[]) new Object[capacity];
         int mid_mid = capacity / 4;
         int s_mid_mid = mid_mid;
         if (nextfirst + 1 < nextback - 1){
@@ -30,7 +30,7 @@ public class ArrayDeque<Item> implements Deque<Item> {
     }
 
     @Override
-    public void addFirst(Item x){
+    public void addFirst(T x){
         if (size == arrlength){
             resize(size * 2);
         }
@@ -43,7 +43,7 @@ public class ArrayDeque<Item> implements Deque<Item> {
     }
 
     @Override
-    public void addLast(Item x){
+    public void addLast(T x){
         if (size == arrlength){
             resize(size * 2);
         }
@@ -74,7 +74,7 @@ public class ArrayDeque<Item> implements Deque<Item> {
     }
 
     @Override
-    public Item removeFirst(){
+    public T removeFirst(){
         if (size == 0){
             return null;
         }
@@ -83,14 +83,14 @@ public class ArrayDeque<Item> implements Deque<Item> {
         }else{
             nextfirst += 1;
         }
-        Item temp = list[nextfirst];
+        T temp = list[nextfirst];
         list[nextfirst] = null;
         size--;
         return temp;
     }
 
     @Override
-    public Item removeLast(){
+    public T removeLast(){
         if (size == 0){
             return null;
         }
@@ -99,14 +99,14 @@ public class ArrayDeque<Item> implements Deque<Item> {
         }else{
             nextback -= 1;
         }
-        Item temp = list[nextback];
+        T temp = list[nextback];
         list[nextback] = null;
         size--;
         return temp;
     }
 
     @Override
-    public Item get(int index){
+    public T get(int index){
         if (index >= size || index < 0){
             return null;
         }
@@ -121,7 +121,7 @@ public class ArrayDeque<Item> implements Deque<Item> {
 //
 //    }
 
-    protected Item[] list;
+    protected T[] list;
     protected int size;
     protected int nextfirst;
     protected int nextback;
