@@ -1,6 +1,6 @@
 package deque;
 
-public class ArrayDeque<Item> {
+public class ArrayDeque<Item> implements Deque<Item> {
     public ArrayDeque(){
         list = (Item[]) new Object[8];
         size = 0;
@@ -29,6 +29,7 @@ public class ArrayDeque<Item> {
         list = temp;
     }
 
+    @Override
     public void addFirst(Item x){
         if (size == arrlength){
             resize(size * 2);
@@ -41,6 +42,7 @@ public class ArrayDeque<Item> {
         size++;
     }
 
+    @Override
     public void addLast(Item x){
         if (size == arrlength){
             resize(size * 2);
@@ -53,12 +55,10 @@ public class ArrayDeque<Item> {
         size++;
     }
 
-    public boolean isEmpty(){
-        return size == 0;
-    }
-
+    @Override
     public int size(){return size;}
 
+    @Override
     public void printDeque(){
         if (size == arrlength){
             for (int i = nextfirst + 1; i < arrlength; i++){
@@ -73,6 +73,7 @@ public class ArrayDeque<Item> {
         }
     }
 
+    @Override
     public Item removeFirst(){
         if (size == 0){
             return null;
@@ -88,6 +89,7 @@ public class ArrayDeque<Item> {
         return temp;
     }
 
+    @Override
     public Item removeLast(){
         if (size == 0){
             return null;
@@ -103,6 +105,7 @@ public class ArrayDeque<Item> {
         return temp;
     }
 
+    @Override
     public Item get(int index){
         if (index >= size || index < 0){
             return null;
@@ -118,10 +121,10 @@ public class ArrayDeque<Item> {
 //
 //    }
 
-    private Item[] list;
-    private int size;
-    private int nextfirst;
-    private int nextback;
-    private int arrlength;
+    protected Item[] list;
+    protected int size;
+    protected int nextfirst;
+    protected int nextback;
+    protected int arrlength;
 
 }
