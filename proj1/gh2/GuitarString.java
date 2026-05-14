@@ -12,11 +12,11 @@ public class GuitarString {
     private static final int SR = 44100;      // Sampling Rate
     private static final double DECAY = .996; // energy decay factor
 
-    /* Buffer for storing sound data. */
-    // TODO: uncomment the following line once you're ready to start this portion
+    /* Buffer for storing sound data. 用于存储声音的缓存区*/
+    // TODO: uncomment the following line once you're ready to start this portion 如果准备好就取消下行的注释符
     // private Deque<Double> buffer;
 
-    /* Create a guitar string of the given frequency.  */
+    /* Create a guitar string of the given frequency.  创建一个给定频率的琴弦*/
     public GuitarString(double frequency) {
         // TODO: Create a buffer with capacity = SR / frequency. You'll need to
         //       cast the result of this division operation into an int. For
@@ -25,7 +25,7 @@ public class GuitarString {
     }
 
 
-    /* Pluck the guitar string by replacing the buffer with white noise. */
+    /* Pluck the guitar string by replacing the buffer with white noise. 用白噪音替换缓存器，然后弹奏吉他弦*/
     public void pluck() {
         // TODO: Dequeue everything in buffer, and replace with random numbers
         //       between -0.5 and 0.5. You can get such a number by using:
@@ -38,7 +38,7 @@ public class GuitarString {
     }
 
     /* Advance the simulation one time step by performing one iteration of
-     * the Karplus-Strong algorithm.
+     * the Karplus-Strong algorithm. 通过执行一次 Karplus-Strong 算法的迭代，讲模拟推进一个步
      */
     public void tic() {
         // TODO: Dequeue the front sample and enqueue a new sample that is
@@ -46,7 +46,7 @@ public class GuitarString {
         //       **Do not call StdAudio.play().**
     }
 
-    /* Return the double at the front of the buffer. */
+    /* Return the double at the front of the buffer. 返回缓冲区前端的双精度浮点数*/
     public double sample() {
         // TODO: Return the correct thing.
         return 0;

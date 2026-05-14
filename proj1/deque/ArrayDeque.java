@@ -1,5 +1,7 @@
 package deque;
 
+import deque.Deque;
+
 public class ArrayDeque<T> implements Deque<T> {
     public ArrayDeque(){
         list = (T[]) new Object[8];
@@ -47,8 +49,7 @@ public class ArrayDeque<T> implements Deque<T> {
         if (size == arrlength){
             resize(size * 2);
         }
-        if (nextback > arrlength - 1){ // 因为索引值从零开始，所以最后一个元素为数组长度 - 1;
-            nextback = 0;
+        if (nextback > arrlength - 1){
         }
         list[nextback++] = x;
 

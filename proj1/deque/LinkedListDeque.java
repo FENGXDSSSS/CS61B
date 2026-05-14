@@ -1,31 +1,29 @@
 package deque;
 
+import deque.Deque;
+
 public class LinkedListDeque<T> implements Deque<T>{
-    private class node{
-        public node(node l, T x, node r){
+    private class Node{
+        public Node(Node l, T x, Node r){
             prev = l;
             item = x;
             next = r;
         }
 
         public T item;
-        public node next;
-        public node prev;
+        public Node next;
+        public Node prev;
     }
-    // 空链表构造
     public  LinkedListDeque(){
-        sentinel = new node(null, null, null);
+        sentinel = new Node(null, null, null);
         sentinel.prev = sentinel;
         sentinel.next = sentinel;
     }
-    // 赋值链表构造
     public  LinkedListDeque(T x){
-        // 定义哨兵节点
-        sentinel = new node(null, null, null);
+        sentinel = new Node(null, null, null);
         sentinel.prev = sentinel;
         sentinel.next = sentinel;
-        // 定义新节点以连接哨兵节点
-        node p = new node(sentinel.next, x, sentinel);
+        Node p = new Node(sentinel.next, x, sentinel);
         sentinel.next = p;
         sentinel.prev = p;
         size = 1;
@@ -33,7 +31,7 @@ public class LinkedListDeque<T> implements Deque<T>{
 
     @Override
     public void addFirst(T x){
-        node p = new node(sentinel, x, sentinel.next);
+        Node p = new Node(sentinel, x, sentinel.next);
         sentinel.next.prev = p;
         sentinel.next = p;
 
@@ -42,7 +40,7 @@ public class LinkedListDeque<T> implements Deque<T>{
 
     @Override
     public void addLast(T x){
-        node p = new node(sentinel.prev, x, sentinel);
+        Node p = new Node(sentinel.prev, x, sentinel);
         sentinel.prev.next = p;
         sentinel.prev = p;
 
@@ -56,7 +54,7 @@ public class LinkedListDeque<T> implements Deque<T>{
 
     @Override
     public void printDeque(){
-        node p = sentinel.next;
+        Node p = sentinel.next;
         while (p.next == sentinel){
             System.out.print(p.item + " ");
             p = p.next;
@@ -69,7 +67,7 @@ public class LinkedListDeque<T> implements Deque<T>{
         if (size == 0){
             return null;
         }
-        node temp = sentinel.next;
+        Node temp = sentinel.next;
 
         sentinel.next = temp.next;
         temp.next.prev = sentinel;
@@ -83,7 +81,7 @@ public class LinkedListDeque<T> implements Deque<T>{
         if (size == 0){
             return null;
         }
-        node temp = sentinel.prev;
+        Node temp = sentinel.prev;
 
         sentinel.prev = temp.prev;
         temp.prev.next = sentinel;
@@ -97,7 +95,7 @@ public class LinkedListDeque<T> implements Deque<T>{
         if (index < 0 || size == 0 || index >= size){
             return null;
         }
-        node temp = sentinel;
+        Node temp = sentinel;
         while (index >= 0){
             temp = temp.next;
             index--;
@@ -126,15 +124,12 @@ public class LinkedListDeque<T> implements Deque<T>{
 
         return true;
     }
-    // 辅助getRecursive递归的函数。
-    public T helpRecursive(int index, node p){
+    public T helpRecursive(int index, Node p){
         if (index < 0){
             return p.item;
         }
-        //index作为参数不用自减，不改变初值
         return helpRecursive(index - 1, p.next);
     }
-    // 递归get
     public T getRecursive(int index){
         if (index < 0 || size == 0 || index >= size){
             return null;
@@ -142,6 +137,6 @@ public class LinkedListDeque<T> implements Deque<T>{
         return helpRecursive(index, sentinel);
     }
 
-    private node sentinel;
+    private Node sentinel;
     private int size;
 }
