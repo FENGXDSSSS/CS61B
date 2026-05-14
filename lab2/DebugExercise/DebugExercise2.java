@@ -1,5 +1,7 @@
 package DebugExercise;
 
+import static java.lang.Math.min;
+
 /**
  * Exercise to showcase the step over button.
  * Code adapted from https://stackoverflow.com/questions/4895173/bitwise-multiply-and-add-in-java and https://stackoverflow.com/questions/1533131/what-useful-bitwise-operator-code-tricks-should-a-developer-know-about
@@ -47,7 +49,7 @@ public class DebugExercise2 {
         int[] returnArray = new int[a.length];
         for (int i = 0; i < a.length; i += 1) {
             int sum = a[i] + b[i];
-            int biggerValue = sum - max(a[i], b[i]);
+            int biggerValue = sum - min(a[i], b[i]);
             returnArray[i] = biggerValue;
         }
 
@@ -77,8 +79,8 @@ public class DebugExercise2 {
 
 
     public static void main(String[] args) {
-        int[] a = {1, 11, -1, -11};
-        int[] b = {3, -3, 2, -1};
+        int[] a = {2, 0, 10, 14};
+        int[] b = {-5, 5, 20, 30};
 
         int sumOfElementwiseMaxes = sumOfElementwiseMaxes(a, b);
         System.out.println(sumOfElementwiseMaxes);

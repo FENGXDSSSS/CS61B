@@ -50,6 +50,7 @@ public class ArrayDeque<T> implements Deque<T> {
             resize(size * 2);
         }
         if (nextback > arrlength - 1){
+            nextback = 0;
         }
         list[nextback++] = x;
 
