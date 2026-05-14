@@ -1,7 +1,5 @@
 package deque;
 
-import deque.Deque;
-
 public class ArrayDeque<T> implements Deque<T> {
     public ArrayDeque(){
         list = (T[]) new Object[8];

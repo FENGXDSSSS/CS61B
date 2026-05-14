@@ -3,7 +3,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.Assert.*;
 
-
 /** Performs some basic linked list tests. */
 public class LinkedListDequeTest {
 
