@@ -2,8 +2,8 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
-    public ArrayDeque(){
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
+    public ArrayDeque() {
         list = (T[]) new Object[8];
         size = 0;
         nextfirst = list.length / 2;
@@ -11,17 +11,17 @@ public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
         arrlength = list.length;
     }
     // 数组扩容_居中复制
-    public void resize(int capacity){
+    private void resize(int capacity) {
         T[] temp = (T[]) new Object[capacity];
         int mid_mid = capacity / 4;
         int s_mid_mid = mid_mid;
-        if (nextfirst + 1 < nextback - 1){
+        if (nextfirst + 1 < nextback - 1) {
             System.arraycopy(list, 0, temp, mid_mid, arrlength);
         }else{
-            for (int i = nextfirst + 1; i < arrlength; i++){
+            for (int i = nextfirst + 1; i < arrlength; i++) {
                 temp[mid_mid++] = list[i];
             }
-            for (int i = 0; i < nextfirst + 1; i++){
+            for (int i = 0; i < nextfirst + 1; i++) {
                 temp[mid_mid++] = list[i];
             }
         }
@@ -32,11 +32,11 @@ public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
     }
 
     @Override
-    public void addFirst(T x){
-        if (size == arrlength){
+    public void addFirst(T x) {
+        if (size == arrlength) {
             resize(size * 2);
         }
-        if (nextfirst < 0){
+        if (nextfirst < 0) {
             nextfirst = arrlength - 1;
         }
         list[nextfirst--] = x;
@@ -45,11 +45,11 @@ public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
     }
 
     @Override
-    public void addLast(T x){
-        if (size == arrlength){
+    public void addLast(T x) {
+        if (size == arrlength) {
             resize(size * 2);
         }
-        if (nextback > arrlength - 1){
+        if (nextback > arrlength - 1) {
             nextback = 0;
         }
         list[nextback++] = x;
@@ -58,31 +58,31 @@ public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
     }
 
     @Override
-    public int size(){return size;}
+    public int size() {return size;}
 
     @Override
-    public void printDeque(){
-        if (size == arrlength){
-            for (int i = nextfirst + 1; i < arrlength; i++){
+    public void printDeque() {
+        if (size == arrlength) {
+            for (int i = nextfirst + 1; i < arrlength; i++) {
                 System.out.print(list[i] + " ");
             }
-            for (int i = 0; i < nextfirst + 1; i++){
+            for (int i = 0; i < nextfirst + 1; i++) {
                 System.out.print(list[i] + " ");
             }
             System.out.println();
-        }else{
+        }else {
 
         }
     }
 
     @Override
-    public T removeFirst(){
-        if (size == 0){
+    public T removeFirst() {
+        if (size == 0) {
             return null;
         }
-        if (nextfirst == arrlength - 1){
+        if (nextfirst == arrlength - 1) {
             nextfirst = 0;
-        }else{
+        }else {
             nextfirst += 1;
         }
         T temp = list[nextfirst];
@@ -92,13 +92,13 @@ public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
     }
 
     @Override
-    public T removeLast(){
-        if (size == 0){
+    public T removeLast() {
+        if (size == 0) {
             return null;
         }
-        if (nextback == 0){
+        if (nextback == 0) {
             nextback = arrlength - 1;
-        }else{
+        }else {
             nextback -= 1;
         }
         T temp = list[nextback];
@@ -108,43 +108,57 @@ public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
     }
 
     @Override
-    public T get(int index){
-        if (index >= size || index < 0){
+    public T get(int index) {
+        if (index >= size || index < 0) {
             return null;
         }
         return list[(nextfirst + 1 + index) % arrlength];
     }
+
     @Override
-    public Iterator<T> iterator(){
-        return new ArrayDequeIterator();
+    public Iterator<T> iterator() {
+        return new ADIterator();
     }
 
-    private class ArrayDequeIterator implements Iterator<T> {
-        private int index;
+    private class ADIterator implements Iterator<T>{
 
-        ArrayDequeIterator() {
-            index = 0;
-        }
         @Override
         public boolean hasNext() {
-            return index < size;
+            return pos != size;
         }
+
         @Override
         public T next() {
-            T item = get(index);
-            index += 1;
-            return item;
+            T temp = get(pos);
+            pos++;
+            return temp;
         }
+
+        private int pos;
     }
 
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof ArrayDeque other) {
+            for (int i = 0; i < size; i++) {
+                if (! (this.get(i).equals(other.get(i)))){
+                    return false;
+                }
+            }
+            return true;
+        }
         return false;
     }
 
-    protected T[] list;
-    protected int size;
-    protected int nextfirst;
-    protected int nextback;
-    protected int arrlength;
+    private T[] list;
+    private int size;
+    private int nextfirst;
+    private int nextback;
+    private int arrlength;
 
 }
