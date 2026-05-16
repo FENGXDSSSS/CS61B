@@ -206,5 +206,7 @@ public class LinkedListDequeTest {
         a2.addFirst(1);
 
         assertEquals(a1, a2);
+
+        assertEquals(a2, a1);
     }
 }

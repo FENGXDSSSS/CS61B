@@ -13,20 +13,20 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     // 数组扩容_居中复制
     private void resize(int capacity) {
         T[] temp = (T[]) new Object[capacity];
-        int mid_mid = capacity / 4;
-        int s_mid_mid = mid_mid;
+        int midMid = capacity / 4;
+        int sMidMid = midMid;
         if (nextfirst + 1 < nextback - 1) {
-            System.arraycopy(list, 0, temp, mid_mid, arrlength);
+            System.arraycopy(list, 0, temp, midMid, arrlength);
         } else {
             for (int i = nextfirst + 1; i < arrlength; i++) {
-                temp[mid_mid++] = list[i];
+                temp[midMid++] = list[i];
             }
             for (int i = 0; i < nextfirst + 1; i++) {
-                temp[mid_mid++] = list[i];
+                temp[midMid++] = list[i];
             }
         }
-        nextfirst = s_mid_mid - 1;
-        nextback = s_mid_mid + arrlength;
+        nextfirst = sMidMid - 1;
+        nextback = sMidMid + arrlength;
         arrlength = capacity;
         list = temp;
     }
@@ -58,7 +58,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     @Override
-    public int size() {return size;}
+    public int size() {
+        return size;
+    }
 
     @Override
     public void printDeque() {
@@ -70,8 +72,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
                 System.out.print(list[i] + " ");
             }
             System.out.println();
-        } else {
-
         }
     }
 
@@ -88,7 +88,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         T temp = list[nextfirst];
         list[nextfirst] = null;
         size--;
-        if (size != 0 && arrlength / size >= 2 && arrlength > 8){
+        if (size != 0 && arrlength / size >= 2 && arrlength > 8) {
             resizeSmall(arrlength / 2);
         }
         return temp;
@@ -107,15 +107,15 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         T temp = list[nextback];
         list[nextback] = null;
         size--;
-        if (size != 0 && arrlength / size >= 2 && arrlength > 8){
+        if (size != 0 && arrlength / size >= 2 && arrlength > 8) {
             resizeSmall(arrlength / 2);
         }
         return temp;
     }
 
-    private void resizeSmall(int capacity){
+    private void resizeSmall(int capacity) {
         T[] temp = (T[]) new Object[capacity];
-        for (int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             temp[i] = this.get(i);
         }
         list = temp;
@@ -137,7 +137,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return new ADIterator();
     }
 
-    private class ADIterator implements Iterator<T>{
+    private class ADIterator implements Iterator<T> {
 
         @Override
         public boolean hasNext() {
@@ -162,9 +162,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return true;
         }
         Deque<?> other = (Deque<?>) o;
+        if (this.size() != other.size()) {
+            return false;
+        }
         for (int i = 0; i < size; i++) {
-            if (! (this.get(i).equals(other.get(i)))){
-                return false;}
+            if (!(this.get(i).equals(other.get(i)))) {
+                return false;
+            }
         }
         return true;
 

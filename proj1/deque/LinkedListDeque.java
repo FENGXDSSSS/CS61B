@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private class Node {
-        public Node(Node l, T x, Node r) {
+        private Node(Node l, T x, Node r) {
             prev = l;
             item = x;
             next = r;
@@ -116,8 +116,11 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof LinkedListDeque)) {
+        if (o == null) {
             return false;
+        }
+        if (this == o) {
+            return true;
         }
         Deque<?> other = ((Deque<?>) o);
 
