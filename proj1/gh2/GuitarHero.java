@@ -8,10 +8,10 @@ public class GuitarHero {
     public static void main(String[] args) {
         String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
         int len = keyboard.length();
-        GuitarString[] Guitar_key = new GuitarString[len];
+        GuitarString[] GuitarKey = new GuitarString[len];
 
         for (int i = 0; i < len; i++) {
-            Guitar_key[i] = new GuitarString((CONC * Math.pow(2.0, (i - 24.0)/ 12.0)));
+            GuitarKey[i] = new GuitarString((CONC * Math.pow(2.0, (i - 24.0) / 12.0)));
         }
 
         while (true) {
@@ -19,17 +19,17 @@ public class GuitarHero {
                 char key = StdDraw.nextKeyTyped();
                 if (keyboard.indexOf(key) != -1) {
                     int index = keyboard.indexOf(key);
-                    Guitar_key[index].pluck();
+                    GuitarKey[index].pluck();
                 }
             }
             double sample = 0;
             for (int i = 0; i < len; i++) {
-                sample += Guitar_key[i].sample();
+                sample += GuitarKey[i].sample();
             }
             StdAudio.play(sample);
 
             for (int i = 0; i < len; i++) {
-                Guitar_key[i].tic();
+                GuitarKey[i].tic();
             }
         }
     }

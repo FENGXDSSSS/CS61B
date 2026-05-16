@@ -10,9 +10,9 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
             next = r;
         }
 
-        public T item;
-        public Node next;
-        public Node prev;
+        private T item;
+        private Node next;
+        private Node prev;
     }
     public  LinkedListDeque() {
         sentinel = new Node(null, null, null);

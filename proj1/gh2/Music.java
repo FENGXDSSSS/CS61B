@@ -13,7 +13,8 @@ import java.util.zip.GZIPInputStream;
  */
 public class Music {
     public static void main(String[] args) {
-        GuitarPlayer player = new GuitarPlayer(new java.io.File("C:\\FENG\\CS\\CS61B\\Midi\\source.mid"));
+        GuitarPlayer player = new GuitarPlayer(new java.io.File(
+                "C:\\FENG\\CS\\CS61B\\Midi\\source.mid"));
         player.play();
         // You can also do this:
         // GuitarPlayer player = new GuitarPlayer(new java.io.File("path/to/music.mid"));

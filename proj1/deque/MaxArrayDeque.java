@@ -9,28 +9,28 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
         if (size() == 0) {
             return null;
         }
-        T max_item = get(0);
+        T maxItem = get(0);
         for (int i = 1; i < size(); i++) {
             T temp = get(i);
-            if (comp.compare(temp, max_item) > 0) {
-                max_item = temp;
+            if (comp.compare(temp, maxItem) > 0) {
+                maxItem = temp;
             }
         }
-        return max_item;
+        return maxItem;
     }
 
     public T max(Comparator<T> c) {
         if (size() == 0) {
             return null;
         }
-        T max_item = get(0);
+        T maxItem = get(0);
         for (int i = 1; i < size(); i++) {
             T temp = get(i);
-            if (c.compare(temp, max_item) > 0) {
-                max_item = temp;
+            if (c.compare(temp, maxItem) > 0) {
+                maxItem = temp;
             }
         }
-        return max_item;
+        return maxItem;
     }
 
     private Comparator<T> comp;
