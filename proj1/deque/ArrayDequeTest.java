@@ -178,10 +178,10 @@ public class ArrayDequeTest {
             } else if (operationNumber == 1) {
                 int randVal = StdRandom.uniform(0, 100);
                 arrayDeque.addLast(randVal);
-            } else if (arrayDeque.size() == 0) {
+            } else if (arrayDeque.isEmpty()) {
                 assertTrue(arrayDeque.isEmpty());
             } else if (operationNumber == 2) {
-                assertTrue(arrayDeque.size() > 0);
+                assertFalse(arrayDeque.isEmpty());
             } else if (operationNumber == 3) {
                 arrayDeque.removeFirst();
             } else if (operationNumber == 4) {

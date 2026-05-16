@@ -17,7 +17,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         int s_mid_mid = mid_mid;
         if (nextfirst + 1 < nextback - 1) {
             System.arraycopy(list, 0, temp, mid_mid, arrlength);
-        }else{
+        } else {
             for (int i = nextfirst + 1; i < arrlength; i++) {
                 temp[mid_mid++] = list[i];
             }
@@ -70,7 +70,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
                 System.out.print(list[i] + " ");
             }
             System.out.println();
-        }else {
+        } else {
 
         }
     }
@@ -82,12 +82,15 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         if (nextfirst == arrlength - 1) {
             nextfirst = 0;
-        }else {
+        } else {
             nextfirst += 1;
         }
         T temp = list[nextfirst];
         list[nextfirst] = null;
         size--;
+        if (size != 0 && arrlength / size >= 2 && arrlength > 8){
+            resizeSmall(arrlength / 2);
+        }
         return temp;
     }
 
@@ -98,13 +101,27 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         if (nextback == 0) {
             nextback = arrlength - 1;
-        }else {
+        } else {
             nextback -= 1;
         }
         T temp = list[nextback];
         list[nextback] = null;
         size--;
+        if (size != 0 && arrlength / size >= 2 && arrlength > 8){
+            resizeSmall(arrlength / 2);
+        }
         return temp;
+    }
+
+    private void resizeSmall(int capacity){
+        T[] temp = (T[]) new Object[capacity];
+        for (int i = 0; i < size; i++){
+            temp[i] = this.get(i);
+        }
+        list = temp;
+        nextfirst = -1;
+        nextback = size;
+        arrlength = capacity;
     }
 
     @Override
@@ -144,7 +161,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (this == o) {
             return true;
         }
-        ArrayDeque<?> other = (ArrayDeque<?>) o;
+        Deque<?> other = (Deque<?>) o;
         for (int i = 0; i < size; i++) {
             if (! (this.get(i).equals(other.get(i)))){
                 return false;}
