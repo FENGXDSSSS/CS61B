@@ -14,7 +14,6 @@ public class Main {
         switch(firstArg) {
             case "init":
                 Repository.init();
-
                 break;
             case "add":
                 Repository.add(args[0]);
