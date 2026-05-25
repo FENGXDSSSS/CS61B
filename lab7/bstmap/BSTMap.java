@@ -1,7 +1,9 @@
 package bstmap;
 import org.apache.commons.math3.ode.ODEIntegrator;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class BSTMap<Key extends Comparable<Key>, Value> implements Map61B<Key, Value>{
@@ -9,17 +11,6 @@ public class BSTMap<Key extends Comparable<Key>, Value> implements Map61B<Key, V
         root = null;
         size = 0;
     }
-
-//    public BSTNode find(BSTNode root, Key k){
-//        if (root == null) {
-//            return root;
-//        }
-//        if (root.key.compareTo(k) == 0) {
-//            return root;
-//        }
-//        if (root.key.compareTo(k) > 0) {return find(root.left, k);}
-//        else {return find(root.right, k);}
-//    }
 
     public Object[] find(BSTNode node, Key k) {
         if (node == null) { return null; }
@@ -110,7 +101,14 @@ public class BSTMap<Key extends Comparable<Key>, Value> implements Map61B<Key, V
 
     @Override
     public Set keySet() {
-        throw new UnsupportedOperationException();
+        if (this.size == 0) {
+            return null;
+        }
+        List<Key> keys = new ArrayList<>();
+        for (BSTNode node : this.root.nodesInOrder()) {
+            keys.add(node.key);
+        }
+        return Set.copyOf(keys);
     }
 
     @Override
@@ -121,6 +119,7 @@ public class BSTMap<Key extends Comparable<Key>, Value> implements Map61B<Key, V
         int direction = (int) obj[2];
         BSTNode node = (BSTNode) obj[0];
         BSTNode target = (BSTNode) obj[1];
+        size -= 1;
         if (direction == 0) {
             Value value = node.val;
             if (isNoneChild(root)) { root = null; }
@@ -193,28 +192,26 @@ public class BSTMap<Key extends Comparable<Key>, Value> implements Map61B<Key, V
 
     @Override
     public Iterator iterator() {
-        return new KeyIterator();
-    }
-
-    private class KeyIterator implements Iterator<Key>{
-
-        @Override
-        public boolean hasNext() {
-            return false;
-        }
-
-        @Override
-        public Key next() {
-            return null;
-        }
+        return keySet().iterator();
     }
 
     private class BSTNode {
-        public BSTNode(Key k, Value v){
+        private BSTNode(Key k, Value v){
             left = null;
             right = null;
             key = k;
             val = v;
+        }
+        private List<BSTNode> nodesInOrder() {
+            List<BSTNode> keys = new ArrayList<>();
+            if (left != null) {
+                keys.addAll(left.nodesInOrder());
+            }
+            keys.add(this);
+            if (right != null) {
+                keys.addAll(right.nodesInOrder());
+            }
+            return keys;
         }
         private BSTNode left;
         private BSTNode right;
