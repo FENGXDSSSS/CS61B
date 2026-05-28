@@ -87,6 +87,12 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public V remove(K key) {
+        int hashKey = hashKey(key);
+        if (containsKey(key)) {
+            V val = findNode(hashKey, key).value;
+            buckets[hashKey].remove(findNode(hashKey, key));
+            return val;
+        }
         return null;
     }
 
@@ -103,7 +109,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public Iterator<K> iterator() {
-        return null;
+        return keySet().iterator();
     }
 
     /**
@@ -126,8 +132,8 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     /** Constructors */
     public MyHashMap() {
-        this(8);
-        bucketsSize = 8;
+        this(16);
+        bucketsSize = 16;
     }
 
     public MyHashMap(int initialSize) {
@@ -217,7 +223,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     // TODO: Implement the methods of the Map61B Interface below
     // Your code won't compile until you do so!
-    private double loadFactor = 1.5;
+    private double loadFactor = 0.75;
     private int size;
     private int bucketsSize;
 }
