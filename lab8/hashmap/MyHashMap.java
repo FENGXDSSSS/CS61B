@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     }
 
     private int hashKey(K key) {
-        return Math.floorMod(key.hashCode(),  bucketsSize);
+        return Math.floorMod(key.hashCode(),  buckets.length);
     }
 
     @Override
