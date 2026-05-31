@@ -3,17 +3,17 @@ package gitlet;
 import jdk.jshell.execution.Util;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public class BufferRm implements Buffer{
+public class BufferRm implements Buffer, Iterable<String>{
+    // 所有数据结构统一在构造函数里存一次盘, 只有在init命令里才执行
     public BufferRm() {
-        buffer = new HashMap<>();
+        buffer = new HashSet<>();
+        save();
     }
 
-    @Override
-    public void add(File filename, byte[] contents) {
-        buffer.put(filename, contents);
+    public void add(String filename) {
+        buffer.add(filename);
     }
 
     @Override
@@ -27,10 +27,27 @@ public class BufferRm implements Buffer{
         Utils.writeObject(bufferRmFile, this);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return buffer.isEmpty();
+    }
+
+    @Override
+    public boolean contain(String fileKey) {
+        return buffer.contains(fileKey);
+    }
+
     public static BufferRm readFromFile() {
         File BufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
         return Utils.readObject(BufferAddFile, BufferRm.class);
     }
 
-    private Map<File, byte[]> buffer;
+    @Override
+    public Iterator<String> iterator() {
+        return buffer.iterator();
+    }
+
+    private Set<String> buffer;
+
+
 }

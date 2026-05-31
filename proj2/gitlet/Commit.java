@@ -3,12 +3,11 @@ package gitlet;
 // TODO: any imports you need here
 import org.checkerframework.checker.units.qual.C;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.time.Instant;
 import java.io.File;
 import java.io.Serializable;
-import java.util.Date; // TODO: You'll likely use this in this class
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -25,20 +24,20 @@ public class Commit implements Serializable {
      * variable is used. We've provided one example for `message`.
      */
     // 由于提交一旦建立就无后续更改，所以构造之初就可序列化
-    public Commit(String message, String author, String last, Map<File, String> stackedBlob) {
+    public Commit(String message, String author, long time, String last, Map<String, String> stackedBlob) {
         // 消息
         this.message = message;
         // 时间戳
-        Instant Now = Instant.now();
-        this.timestemp = Now.getEpochSecond();
+        this.timestemp = time;
         // last提交
         this.last = last;
         // Blob追踪映射
-        this.stackedBlob = stackedBlob;
+        this.stackedBlob = new HashMap<>();
+        this.stackedBlob.putAll(stackedBlob);
         // 映射
         this.author = author;
         // hash计算
-        this.sha1 = Utils.sha1(this);
+        this.sha1 = Utils.sha1(message, author, timestemp, last, new TreeMap<> (stackedBlob));
         // 存盘
         save();
     }
@@ -48,7 +47,11 @@ public class Commit implements Serializable {
         return sha1;
     }
 
-    public Map<File, String> getStackedBlob() {
+    public String getLast() {
+        return last;
+    }
+
+    public Map<String, String> getStackedBlob() {
         return stackedBlob;
     }
 
@@ -57,14 +60,33 @@ public class Commit implements Serializable {
         Utils.writeObject(commitFile, this);
     }
 
-    public static Commit readFormFile(String sha1OfCommit) {
+    public boolean containStacked(String fileKey) {
+        return stackedBlob.containsKey(fileKey);
+    }
+
+    public static Commit readFromFile(String sha1OfCommit) {
         File CommitFile = Utils.join(Repository.COMMIT_DIR, sha1OfCommit);
         return Utils.readObject(CommitFile, Commit.class);
     }
 
+    private String getDate() {
+        Date date = new Date(timestemp);
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
+        return formatter.format(date);
+    }
+
+    @Override
+    public String toString() {
+        String message = "===\n";
+        message += "commit " + this.getSha1() + "\n";
+        message += "Date: " + this.getDate() + "\n";
+        message += this.message + "\n";
+        return message;
+    }
+
     private String message;
     private long timestemp;
-    private Map<File, String> stackedBlob;
+    private Map<String, String> stackedBlob;
     private String last;
     private String author;
     private String sha1;

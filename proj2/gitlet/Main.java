@@ -16,9 +16,17 @@ public class Main {
                 Repository.init();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` commands
+                Repository.add(args[1]);
                 break;
-            // TODO: FILL THE REST IN
+            case "commit":
+                Repository.commit(args[1]);
+                break;
+            case "rm":
+                Repository.remove(args[1]);
+                break;
+            case "log":
+                Repository.log();
+                break;
         }
     }
 }

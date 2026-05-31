@@ -1,14 +1,16 @@
+//Binary Large Object（中文通常翻译为：二进制大型对象）
 package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class Blob implements Serializable {
     // 同Commit一旦建立后续无需更改，构造之初即可序列化
-    public Blob(File fileName, byte[] contents) {
+    public Blob(String fileName, byte[] contents) {
         this.fileName = fileName;
-        this.contents = contents;
-        this.sha1 = Utils.sha1(contents);
+        this.contents = Arrays.copyOf(contents, contents.length);
+        this.sha1 = Utils.sha1(this.contents);
 
         save();
     }
@@ -17,7 +19,7 @@ public class Blob implements Serializable {
         return sha1;
     }
 
-    public File getName() {
+    public String getName() {
         return fileName;
     }
 
@@ -31,7 +33,7 @@ public class Blob implements Serializable {
         return Utils.readObject(BlobFile, Blob.class);
     }
 
-    private File fileName;
+    private String fileName;
     private byte[] contents;
     private String sha1;
 }
