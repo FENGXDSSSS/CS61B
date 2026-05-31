@@ -27,6 +27,11 @@ public class Branch implements Serializable {
         Utils.writeObject(BranchFile, this);
     }
 
+    public static Branch readFromFile() {
+        File BranchFile = Utils.join(Repository.BRANCH_DIR, "branch");
+        return Utils.readObject(BranchFile, Branch.class);
+    }
+
     // TODO 切换分支
     private Map<String, String> branchMap;
     private String currentBranch;

@@ -33,7 +33,7 @@ public class Repository {
     // 分支目录
     public static final File BRANCH_DIR = join(GITLET_DIR, "branch");
     /* TODO: fill in the rest of this class. */
-    public void init() {
+    public static void init() {
         if (!GITLET_DIR.mkdir()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             return;

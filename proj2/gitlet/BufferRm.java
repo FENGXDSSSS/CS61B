@@ -26,5 +26,11 @@ public class BufferRm implements Buffer{
         File bufferRmFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
         Utils.writeObject(bufferRmFile, this);
     }
+
+    public static BufferRm readFromFile() {
+        File BufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
+        return Utils.readObject(BufferAddFile, BufferRm.class);
+    }
+
     private Map<File, byte[]> buffer;
 }

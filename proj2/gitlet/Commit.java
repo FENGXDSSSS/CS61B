@@ -1,6 +1,8 @@
 package gitlet;
 
 // TODO: any imports you need here
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.time.Instant;
@@ -22,6 +24,7 @@ public class Commit implements Serializable {
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
+    // 由于提交一旦建立就无后续更改，所以构造之初就可序列化
     public Commit(String message, String author, String last, Map<File, String> stackedBlob) {
         // 消息
         this.message = message;
@@ -36,6 +39,8 @@ public class Commit implements Serializable {
         this.author = author;
         // hash计算
         this.sha1 = Utils.sha1(this);
+        // 存盘
+        save();
     }
     /** The message of this Commit. */
 
@@ -50,6 +55,11 @@ public class Commit implements Serializable {
     public void save() {
         File commitFile = Utils.join(Repository.COMMIT_DIR, getSha1());
         Utils.writeObject(commitFile, this);
+    }
+
+    public static Commit readFormFile(String sha1OfCommit) {
+        File CommitFile = Utils.join(Repository.COMMIT_DIR, sha1OfCommit);
+        return Utils.readObject(CommitFile, Commit.class);
     }
 
     private String message;
