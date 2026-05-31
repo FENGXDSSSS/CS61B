@@ -1,5 +1,7 @@
 package gitlet;
 
+import jdk.jshell.execution.Util;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,5 +21,10 @@ public class BufferRm implements Buffer{
         buffer.clear();
     }
 
+    @Override
+    public void save() {
+        File bufferRmFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
+        Utils.writeObject(bufferRmFile, this);
+    }
     private Map<File, byte[]> buffer;
 }

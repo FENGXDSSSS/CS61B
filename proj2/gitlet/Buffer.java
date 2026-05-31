@@ -7,4 +7,6 @@ public interface Buffer extends Serializable {
     public void add(File filename, byte[] contents);
 
     public void clear();
+
+    public void save();
 }

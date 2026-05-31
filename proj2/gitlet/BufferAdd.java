@@ -16,5 +16,11 @@ public class BufferAdd implements Buffer{
     public void clear() {
         buffer.clear();
     }
+
+    @Override
+    public void save() {
+        File bufferAddFIle = Utils.join(Repository.BUFFER_DIR, "bufferAdd");
+        Utils.writeObject(bufferAddFIle, this);
+    }
     private Map<File, byte[]> buffer;
 }

@@ -47,6 +47,11 @@ public class Commit implements Serializable {
         return stackedBlob;
     }
 
+    public void save() {
+        File commitFile = Utils.join(Repository.COMMIT_DIR, getSha1());
+        Utils.writeObject(commitFile, this);
+    }
+
     private String message;
     private long timestemp;
     private Map<File, String> stackedBlob;

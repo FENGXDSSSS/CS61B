@@ -24,6 +24,25 @@ public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-
+    // 对象目录
+    public static final File OBJECT_DIR = join(GITLET_DIR, "object");
+    public static final File COMMIT_DIR = join(OBJECT_DIR, "commit");
+    public static final File BLOB_DIR = join(GITLET_DIR, "blob");
+    // 缓存目录
+    public static final File BUFFER_DIR = join(GITLET_DIR, "buffer");
+    // 分支目录
+    public static final File BRANCH_DIR = join(GITLET_DIR, "branch");
     /* TODO: fill in the rest of this class. */
+    public void init() {
+        if (!GITLET_DIR.mkdir()) {
+            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            return;
+        }
+        if (!OBJECT_DIR.mkdir()) {
+            COMMIT_DIR.mkdir();
+            BLOB_DIR.mkdir();
+        }
+        BUFFER_DIR.mkdir();
+        BRANCH_DIR.mkdir();
+    }
 }
