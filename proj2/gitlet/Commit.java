@@ -21,8 +21,6 @@ public class Commit {
 
     /** The message of this Commit. */
     private String message;
-    private Date datetime;
-    private Commit left;
-    private Commit right;
+
     /* TODO: fill in the rest of this class. */
 }
