@@ -38,8 +38,7 @@ public class Commit implements Serializable {
         this.author = author;
         // hash计算
         this.sha1 = Utils.sha1(message, author, timestemp, last, new TreeMap<> (stackedBlob));
-        // 存盘
-        save();
+
     }
     /** The message of this Commit. */
 
@@ -73,6 +72,10 @@ public class Commit implements Serializable {
         Date date = new Date(timestemp);
         SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         return formatter.format(date);
+    }
+
+    public boolean isEqualsMessage(String findMessage) {
+        return findMessage.equals(this.message);
     }
 
     @Override

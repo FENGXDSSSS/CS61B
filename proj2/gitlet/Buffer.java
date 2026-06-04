@@ -12,4 +12,6 @@ public interface Buffer extends Serializable {
     public boolean isEmpty();
 
     public boolean contain(String fileKey);
+
+    public void showContain();
 }

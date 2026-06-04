@@ -11,8 +11,6 @@ public class Blob implements Serializable {
         this.fileName = fileName;
         this.contents = Arrays.copyOf(contents, contents.length);
         this.sha1 = Utils.sha1(this.contents);
-
-        save();
     }
 
     public String getSha1() {

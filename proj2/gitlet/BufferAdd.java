@@ -1,12 +1,7 @@
 package gitlet;
 
-import afu.org.checkerframework.checker.igj.qual.I;
-import jdk.jshell.execution.Util;
-
 import java.io.File;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 public class BufferAdd implements Buffer, Iterable<String> {
     // 所有数据结构统一在构造函数里存一次盘, 只有在init命令里才执行
@@ -48,14 +43,36 @@ public class BufferAdd implements Buffer, Iterable<String> {
         return buffer.containsKey(fileKey);
     }
 
-    public static BufferAdd readFromFile() {
-        File BufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferAdd");
-        return Utils.readObject(BufferAddFile, BufferAdd.class);
+    @Override
+    public void showContain() {
+        if (this.isEmpty()) {
+            return;
+        } else {
+            System.out.print(this.toString());
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder message = new StringBuilder("=== Staged Files ===\n");
+        List<String> keySet = new ArrayList<>(buffer.keySet());
+        // 字母排序
+        Collections.sort(keySet);
+        for (String fileName : keySet) {
+            message.append(fileName).append("\n");
+        }
+
+        return message.toString();
     }
 
     @Override
     public Iterator<String> iterator() {
         return buffer.keySet().iterator();
+    }
+
+    public static BufferAdd readFromFile()   {
+        File BufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferAdd");
+        return Utils.readObject(BufferAddFile, BufferAdd.class);
     }
 
     private Map<String, byte[]> buffer;

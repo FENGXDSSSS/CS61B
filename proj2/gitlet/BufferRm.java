@@ -37,6 +37,28 @@ public class BufferRm implements Buffer, Iterable<String>{
         return buffer.contains(fileKey);
     }
 
+    @Override
+    public void showContain() {
+        if (this.isEmpty()) {
+            return;
+        } else {
+            System.out.print(this.toString());
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder message = new StringBuilder("=== Staged Files ===\n");
+        List<String> keySet = new ArrayList<>(buffer);
+        // 字母排序
+        Collections.sort(keySet);
+        for (String fileName : keySet) {
+            message.append(fileName).append("\n");
+        }
+
+        return message.toString();
+    }
+
     public static BufferRm readFromFile() {
         File BufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
         return Utils.readObject(BufferAddFile, BufferRm.class);

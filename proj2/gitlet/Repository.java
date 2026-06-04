@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static gitlet.Utils.*;
@@ -55,14 +56,19 @@ public class Repository {
         // 初始提交
         // 获取当前时间戳new Date().getTime();
         Commit initCommit = new Commit("initial commit", userName, 0, null, null);
+        initCommit.save();
         // 初始化分支，将当前提交纳入初始化分支，初始分支为master
         // 分支类具有HEAD属性，存放initCommit hash， 此时 HEAD = initCommit.getSha1
         // 分支类也具有currentBranch属性，存放当前分支路线的名称，此时currentBranch = "master"
         // 构造时自动序列化进硬盘, 通过Utils.join(Repository.BRANCH_DIR, "branch")地址重新反序列化操作
-        new Branch(initCommit.getSha1());
+        Branch branch = new Branch(initCommit.getSha1());
         // 初始化缓存区
-        new BufferAdd();
-        new BufferRm();
+        BufferAdd bufferadd = new BufferAdd();
+        BufferRm bufferrm = new BufferRm();
+        // 存盘
+        branch.save();
+        bufferadd.save();
+        bufferrm.save();
     }
 
     public static void add(String fileName) {
@@ -96,6 +102,7 @@ public class Repository {
         // 更新修改的文件或新建的文件的追踪列表，需要创建Blob实例并序列化写入硬盘
         for (String key : bufferAdd) {
             Blob tempBlob = new Blob(key, bufferAdd.getContents(key));
+            tempBlob.save();
             updatedStacked.put(key, tempBlob.getSha1());
         }
         // 更新删除的文件追踪列表，无需创建新的Blob实例也无需序列化写入硬盘
@@ -126,7 +133,7 @@ public class Repository {
         // 分支文件载入
         /* branch:
                 branch (Map<String, String> branchName, commitHash)
-                HEAD (String -> commitHash)
+                HEAD (String -> commitHash)Commit
                 currentBranch (String -> branchName)
         */
         Branch branch = Branch.readFromFile();
@@ -136,13 +143,15 @@ public class Repository {
         // 更新追踪列表
         Map<String, String> stacked = updateStacked(currentCommit, bufferAdd, bufferRm);
         // 新建commit实例
-        Head = new Commit(message, userName, new Date().getTime(), Head, stacked).getSha1();
+        Commit newCommit = new Commit(message, userName, new Date().getTime(), Head, stacked);
+        Head = newCommit.getSha1();
         // 重新设置到当前分支当前指针上
         branch.setHEAD(Head);
         /* 各部件依此重新序列化(谁被更改谁序列化)
             1.缓冲区状态被清空，遂需要再次序列化更新状态
             2.分支中HEAD状态被修改，遂需要再次序列化以更新状态
         */
+        newCommit.save();
         bufferAdd.save();
         bufferRm.save();
         branch.save();
@@ -202,5 +211,45 @@ public class Repository {
         String Head = branch.getHEAD();
 
         logHelper(Head);
+    }
+    // 全局log
+    public static void globalLog(){
+        List<String> commitList;
+        commitList = Utils.plainFilenamesIn(COMMIT_DIR);
+        if (commitList != null) {
+            for (String dir : commitList){
+                // 载入
+                Commit commitPrintLog = Commit.readFromFile(dir);
+                System.out.println(commitPrintLog.toString());
+            }
+        }
+    }
+
+    public static void find(String message){
+        List<String> commitList;
+        commitList = Utils.plainFilenamesIn(COMMIT_DIR);
+        if (commitList != null) {
+            for (String dir : commitList) {
+                Commit commitPrintID = Commit.readFromFile(dir);
+                if (commitPrintID.isEqualsMessage(message)) {
+                    System.out.print(commitPrintID.getSha1());
+                }
+            }
+        }
+    }
+
+    public static void status() {
+        // 操作先载入
+        BufferAdd bufferAdd = BufferAdd.readFromFile();
+        BufferRm bufferRm = BufferRm.readFromFile();
+        Branch branch = Branch.readFromFile();
+        // 打印状态
+        branch.showCurrentBranch();
+        bufferAdd.showContain();
+        bufferRm.showContain();
+    }
+
+    public static void checkout() {
+
     }
 }
