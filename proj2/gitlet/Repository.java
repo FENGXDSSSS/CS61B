@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static gitlet.Utils.*;
 
@@ -147,6 +148,7 @@ public class Repository {
         Head = newCommit.getSha1();
         // 重新设置到当前分支当前指针上
         branch.setHEAD(Head);
+        branch.updateCurBranch(Head);
         /* 各部件依此重新序列化(谁被更改谁序列化)
             1.缓冲区状态被清空，遂需要再次序列化更新状态
             2.分支中HEAD状态被修改，遂需要再次序列化以更新状态
@@ -249,7 +251,124 @@ public class Repository {
         bufferRm.showContain();
     }
 
-    public static void checkout() {
+    public static void checkoutFile(String fileName) {
+        // 载入到内存
+        BufferAdd bufferAdd = BufferAdd.readFromFile();
+        File fileDir = Utils.join(CWD, fileName);
+        Branch branch = Branch.readFromFile();
+        String Head = branch.getHEAD();
+        Commit curCommit = Commit.readFromFile(Head);
+
+        /*if (bufferAdd.contain(fileName)) {
+            Utils.writeContents(fileDir, (Object) bufferAdd.getContents(fileName));
+        } */
+        if (curCommit.fileIsStacked(fileName)) {
+            byte[] contents = curCommit.getStackedFileContents(fileName);
+            Utils.writeContents(fileDir, (Object) contents);
+        } else {
+            System.out.println("File does not exist in that commit.");
+        }
+    }
+
+    //辅助方法 ↓
+    private static Commit getThatCommit(String Head, String commitID) {
+        Commit targetCommit = null;
+        int flag = 0;
+        while (Head != null) {
+            Commit commit = Commit.readFromFile(Head);
+            // 前缀匹配
+            if (commit.getSha1().startsWith(commitID)) {
+                flag += 1;
+                targetCommit = commit;
+            }
+            Head = commit.getLast();
+        }
+
+        if (1 == flag) {
+            return targetCommit;
+        } else {
+            return null;
+        }
+    }
+
+    public static void checkoutCommitFile(String commitID, String fileName) {
+        // 依旧先载入这一块
+        File fileDir = Utils.join(CWD, fileName);
+        Branch branch = Branch.readFromFile();
+        String Head = branch.getHEAD();
+        Commit thatCommit = getThatCommit(Head, commitID);
+        if (thatCommit == null) {
+            System.out.println("No commit with that id exists.");
+            return;
+        } else {
+            if (thatCommit.fileIsStacked(fileName)) {
+                byte[] contents = thatCommit.getStackedFileContents(fileName);
+                Utils.writeContents(fileDir, (Object) contents);
+            } else {
+                System.out.println("File does not exist in that commit.");
+            }
+        }
+    }
+
+    public static void checkoutBranch(String branchName) {
+        // 载入所有工作目录下的文件非文件夹
+        File fileDir = Utils.join(CWD);
+        File[] fileList = fileDir.listFiles();
+        // 依旧
+        BufferAdd bufferAdd = BufferAdd.readFromFile();
+        Branch branch = Branch.readFromFile();
+        if (branch.isCurrentBranch(branchName)) {
+            System.out.println("No need to checkout the current branch.");
+            return;
+        } else if (branch.curBranchIsContained(branchName)){
+            System.out.println("No such branch exists.");
+            return;
+        } else {
+            String commitSha1 = branch.getHEAD();
+            Commit curCommit = Commit.readFromFile(commitSha1);
+            String targetHead = branch.getTargetHead(branchName);
+            Commit targetCommit = Commit.readFromFile(targetHead);
+            // 更新状态
+            curCommit.update();
+            for (String fileName : curCommit.getUnstackedFile()) {
+                if (targetCommit.fileIsStacked(fileName)) {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    return;
+                }
+            }
+            // 切换分支
+            branch.goToBranch(branchName);
+            // 删除当前目录的所有文件
+            if (fileList != null) {
+                for (File file : fileList) {
+                    if (curCommit.fileIsStacked(file.getName())) {
+                        file.delete();
+                    }
+                }
+            }
+            // 清除BufferAdd映射表
+            bufferAdd.clear();
+            targetCommit.writeFilesFromStacked();
+        }
+    }
+
+    public static void branch(String branchName) {
+        // 取出branch读入内存
+        Branch branch = Branch.readFromFile();
+        if (! branch.createBranch(branchName)) {
+            return;
+        }
+    }
+
+    public static void rmBranch(String branchName) {
+        
+    }
+
+    public static void reset(String commitID) {
+
+    }
+
+    public static void merge(String branchName) {
 
     }
 }

@@ -42,16 +42,48 @@ public class Commit implements Serializable {
     }
     /** The message of this Commit. */
 
+    // 获取sha1值
     public String getSha1() {
         return sha1;
     }
 
+    // 获取上一次提交
     public String getLast() {
         return last;
     }
 
+    // 获取追踪目录
     public Map<String, String> getStackedBlob() {
         return stackedBlob;
+    }
+
+    // 设置未追踪名单
+    public void setUnstackedFile(String unstacked) {
+        unstackedFile.add(unstacked);
+    }
+
+    // 更新当前工作目录文件状态
+    public void update() {
+        // 获取文件列表
+        File fileDir = Repository.CWD;
+        File[] fileList = fileDir.listFiles();
+
+        if (fileList != null) {
+            for (File file : fileList) {
+                String fileName = file.getName();
+                // 如果不在追踪列表
+                if (!containStacked(fileName)) {
+                    unstackedFile.add(fileName);
+                    continue;
+                }
+                // 获取文件内容
+                byte[] fileContents = Utils.readContents(file);
+                // 如果内容不一致
+                if (!Arrays.equals(getStackedFileContents(fileName), fileContents)) {
+                    unstackedFile.add(fileName);
+                }
+            }
+        }
     }
 
     public void save() {
@@ -59,23 +91,58 @@ public class Commit implements Serializable {
         Utils.writeObject(commitFile, this);
     }
 
+    // 是否包含指定文件key
     public boolean containStacked(String fileKey) {
         return stackedBlob.containsKey(fileKey);
     }
 
+    // 读文件
     public static Commit readFromFile(String sha1OfCommit) {
         File CommitFile = Utils.join(Repository.COMMIT_DIR, sha1OfCommit);
         return Utils.readObject(CommitFile, Commit.class);
     }
 
+    // 获取当前时间戳
     private String getDate() {
         Date date = new Date(timestemp);
         SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         return formatter.format(date);
     }
 
+    // 消息message是否与指定消息相同
     public boolean isEqualsMessage(String findMessage) {
         return findMessage.equals(this.message);
+    }
+
+    // 文件是否被跟踪
+    public boolean fileIsStacked(String fileName) {
+        return stackedBlob.containsKey(fileName);
+    }
+
+    // 获得跟指定的追踪文件内容
+    public byte[] getStackedFileContents(String fileName) {
+        String blobID = stackedBlob.get(fileName);
+        Blob thisBlob = Blob.readFromFile(blobID);
+        return thisBlob.getContents();
+    }
+
+    public Set<String> getUnstackedFile() {
+        return unstackedFile;
+    }
+
+    // 是否未跟踪
+    public boolean isUnstacked() {
+        // 是空返回true
+        return unstackedFile.isEmpty();
+    }
+
+    // 追踪列表写入文件
+    public void writeFilesFromStacked() {
+        for (String fileName : stackedBlob.keySet()) {
+            File file = Utils.join(Repository.CWD, fileName);
+            byte[] contents = getStackedFileContents(fileName);
+            Utils.writeContents(file, (Object) contents);
+        }
     }
 
     @Override
@@ -90,6 +157,7 @@ public class Commit implements Serializable {
     private String message;
     private long timestemp;
     private Map<String, String> stackedBlob;
+    private Set<String> unstackedFile;
     private String last;
     private String author;
     private String sha1;

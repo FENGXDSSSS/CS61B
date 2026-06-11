@@ -21,6 +21,10 @@ public class Blob implements Serializable {
         return fileName;
     }
 
+    public byte[] getContents() {
+        return contents;
+    }
+
     public void save() {
         File blobFile = Utils.join(Repository.BLOB_DIR, getSha1());
         Utils.writeObject(blobFile, this);

@@ -37,7 +37,25 @@ public class Main {
                 Repository.status();
                 break;
             case "checkout":
-                Repository.checkout();
+                if (args.length == 3 && args[1].equals("--")) {
+                    Repository.checkoutFile(args[2]);
+                } else if (args.length == 4 && args[2].equals("--")) {
+                    Repository.checkoutCommitFile(args[1], args[3]);
+                } else {
+                    Repository.checkoutBranch(args[1]);
+                }
+                break;
+            case "branch":
+                Repository.branch(args[1]);
+                break;
+            case "rm-branch":
+                Repository.rmBranch(args[1]);
+                break;
+            case "reset":
+                Repository.reset(args[1]);
+                break;
+            case "merge":
+                Repository.merge(args[1]);
                 break;
         }
     }
