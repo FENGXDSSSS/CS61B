@@ -271,17 +271,15 @@ public class Repository {
     }
 
     //辅助方法 ↓
-    private static Commit getThatCommit(String Head, String commitID) {
+    private static Commit getThatCommit(String commitID) {
         Commit targetCommit = null;
         int flag = 0;
-        while (Head != null) {
-            Commit commit = Commit.readFromFile(Head);
-            // 前缀匹配
-            if (commit.getSha1().startsWith(commitID)) {
+
+        for (File file : COMMIT_DIR.listFiles()) {
+            if (file.getName().startsWith(commitID)) {
                 flag += 1;
-                targetCommit = commit;
+                targetCommit = Commit.readFromFile(file.getName());
             }
-            Head = commit.getLast();
         }
 
         if (1 == flag) {
@@ -295,8 +293,7 @@ public class Repository {
         // 依旧先载入这一块
         File fileDir = Utils.join(CWD, fileName);
         Branch branch = Branch.readFromFile();
-        String Head = branch.getHEAD();
-        Commit thatCommit = getThatCommit(Head, commitID);
+        Commit thatCommit = getThatCommit(commitID);
         if (thatCommit == null) {
             System.out.println("No commit with that id exists.");
             return;
@@ -348,6 +345,7 @@ public class Repository {
             }
             // 清除BufferAdd映射表
             bufferAdd.clear();
+            bufferAdd.save();
             targetCommit.writeFilesFromStacked();
         }
     }
@@ -361,14 +359,43 @@ public class Repository {
     }
 
     public static void rmBranch(String branchName) {
-        
+        // 取出branch入内存
+        Branch branch = Branch.readFromFile();
+        if (branch.curBranchIsContained(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        } else if (branch.isCurrentBranch(branchName)) {
+            System.out.println("Cannot remove the current branch.");
+            return;
+        } else {
+            branch.removeBranch(branchName);
+        }
+
+        branch.save();
     }
 
     public static void reset(String commitID) {
+        Branch branch = Branch.readFromFile();
+        BufferAdd bufferAdd = BufferAdd.readFromFile();
 
+        Commit targetCommit = getThatCommit(commitID);
+        if (targetCommit == null) { System.out.println("No commit with that id exists."); return; }
+        rmDir();
+        targetCommit.writeFilesFromStacked();
+        branch.updateCurBranch(targetCommit.getSha1());
+        bufferAdd.clear();
+        bufferAdd.save();
     }
 
     public static void merge(String branchName) {
 
+    }
+    // 清空工作目录
+    private static void rmDir() {
+        for (File file : CWD.listFiles()) {
+            if (!file.isDirectory()) {
+                file.delete();
+            }
+        }
     }
 }

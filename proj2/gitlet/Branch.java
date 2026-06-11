@@ -64,6 +64,12 @@ public class Branch implements Serializable {
         System.out.print(this.toString());
     }
 
+    // 更新分支节点
+    public void updateCurBranchHead(String commitID) {
+        branchMap.put(currentBranch, commitID);
+        HEAD = branchMap.get(currentBranch);
+    }
+
     // 格式化自身数据
     @Override
     public String toString() {
@@ -92,6 +98,11 @@ public class Branch implements Serializable {
         // 更该当前HEAD指向commit节点
         currentBranch = branchName;
         HEAD = branchMap.get(currentBranch);
+    }
+
+    // 删除分支
+    public void removeBranch(String branchName) {
+        branchMap.remove(branchName);
     }
 
     // 读取文件

@@ -99,6 +99,9 @@ public class Commit implements Serializable {
     // 读文件
     public static Commit readFromFile(String sha1OfCommit) {
         File CommitFile = Utils.join(Repository.COMMIT_DIR, sha1OfCommit);
+        if (!CommitFile.exists()) {
+            return null;
+        }
         return Utils.readObject(CommitFile, Commit.class);
     }
 

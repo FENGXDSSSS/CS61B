@@ -70,6 +70,4 @@ public class BufferRm implements Buffer, Iterable<String>{
     }
 
     private Set<String> buffer;
-
-
 }
