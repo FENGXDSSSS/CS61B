@@ -154,7 +154,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         this.loadFactor = maxLoad;
     }
 
-        private double load() {
+    private double load() {
         return size / (double) buckets.length;
     }
 
