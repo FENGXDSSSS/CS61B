@@ -1,5 +1,5 @@
 # This makefile is defined to give you the following targets:
-#
+
 #    default: The default target: Compiles the program in package db61b.
 #    style: Run our style checker on the project source files.  Requires that
 #           the source files compile.
@@ -22,7 +22,7 @@ PACKAGE = capers
 # has a different name for this program (such as just "python"), run
 # the Makefile with
 #	make PYTHON=python check
-PYTHON = python3
+PYTHON = python
 
 # Flags to pass to tester.py.
 TESTER_FLAGS =
