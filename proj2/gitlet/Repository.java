@@ -345,8 +345,8 @@ public class Repository {
             curCommit.update();
             for (String fileName : curCommit.getUnstackedFile()) {
                 if (targetCommit.fileIsStacked(fileName)) {
-                    System.out.println
-                    ("There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.out.println("There is an untracked file in the way; " +
+                            "delete it, or add and commit it first.");
                     return;
                 }
             }
