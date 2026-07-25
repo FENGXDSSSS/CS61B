@@ -251,6 +251,11 @@ public class Repository {
         branch.showCurrentBranch();
         bufferAdd.showContain();
         bufferRm.showContain();
+        // 保留标题
+        String modify = "=== Modifications Not Staged For Commit ===\n\n";
+        String untracked = "=== Untracked Files ===\n\n";
+        System.out.println(modify + untracked);
+
     }
 
     public static void checkoutFile(String fileName) {
