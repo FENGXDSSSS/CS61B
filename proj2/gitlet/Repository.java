@@ -249,6 +249,8 @@ public class Repository {
     }
 
     public static void find(String message) {
+        // 记录次数
+        int next = 0;
         List<String> commitList;
         commitList = Utils.plainFilenamesIn(COMMIT_DIR);
         if (commitList != null) {
@@ -256,8 +258,12 @@ public class Repository {
                 Commit commitPrintID = Commit.readFromFile(dir);
                 if (commitPrintID.isEqualsMessage(message)) {
                     System.out.println(commitPrintID.getSha1());
+                    next += 1;
                 }
             }
+        }
+        if (next == 0) {
+            System.out.println("Found no commit with that message.");
         }
     }
 
