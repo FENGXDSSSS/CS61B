@@ -105,8 +105,8 @@ public class Repository {
         return message.isEmpty() || message.trim().isEmpty();
     }
 
-    private static Map<String, String> updateStacked
-        (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
+    private static Map<String, String> updateStacked(Commit current, BufferAdd bufferAdd,
+                                                     BufferRm bufferRm) {
         // stacked (Map<File, String> Map-> fileName, BlobHash)
         // buffer (Map<File, byte[]>) create-> Blob
         Map<String, String> updatedStacked = current.getStackedBlob();
