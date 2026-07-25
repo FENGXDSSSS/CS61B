@@ -42,8 +42,8 @@ public class Repository {
     public static void init() {
         // 创建目录
         if (!GITLET_DIR.mkdir()) {
-            System.out.println
-                ("A Gitlet version-control system already exists in the current directory.");
+            System.out.println("A Gitlet version-control system already "
+                    + "exists in the current directory.");
             return;
         }
         if (OBJECT_DIR.mkdir()) {
@@ -106,7 +106,7 @@ public class Repository {
     }
 
     private static Map<String, String> updateStacked
-    (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
+        (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
         // stacked (Map<File, String> Map-> fileName, BlobHash)
         // buffer (Map<File, byte[]>) create-> Blob
         Map<String, String> updatedStacked = current.getStackedBlob();
