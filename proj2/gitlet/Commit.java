@@ -23,7 +23,7 @@ public class Commit implements Serializable {
     public Commit(String message, String author,
                   long time, String last, Map<String, String> stackedBlob1) {
         // 消息
-        this.messages= message;
+        this.messages = message;
         // 时间戳
         this.timestemp = time;
 

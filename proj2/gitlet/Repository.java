@@ -43,7 +43,7 @@ public class Repository {
         // 创建目录
         if (!GITLET_DIR.mkdir()) {
             System.out.println
-                    ("A Gitlet version-control system already exists in the current directory.");
+            ("A Gitlet version-control system already exists in the current directory.");
             return;
         }
         if (OBJECT_DIR.mkdir()) {
@@ -106,7 +106,7 @@ public class Repository {
     }
 
     private static Map<String, String> updateStacked
-    (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
+        (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
         // stacked (Map<File, String> Map-> fileName, BlobHash)
         // buffer (Map<File, byte[]>) create-> Blob
         Map<String, String> updatedStacked = current.getStackedBlob();
@@ -346,7 +346,7 @@ public class Repository {
             for (String fileName : curCommit.getUnstackedFile()) {
                 if (targetCommit.fileIsStacked(fileName)) {
                     System.out.println
-                            ("There is an untracked file in the way; delete it, or add and commit it first.");
+                    ("There is an untracked file in the way; delete it, or add and commit it first.");
                     return;
                 }
             }
