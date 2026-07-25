@@ -82,13 +82,21 @@ public class Repository {
             System.out.println("File does not exist.");
             return;
         }
-        // 反序列化缓冲区(Add)
+        // 反序列化缓冲区(Add)/(Rm)
         BufferAdd bufferAdd = BufferAdd.readFromFile();
-        // 写入缓冲区
-        byte[] contents = Utils.readContents(addFile);
-        bufferAdd.add(addFile.getName(), contents);
-        // 再次序列化缓冲区
-        bufferAdd.save();
+        BufferRm bufferRm = BufferRm.readFromFile();
+        // 检查此次添加是否为恢复操作
+        if (bufferRm.contain(addFile.getName())) {
+            // 从Rm缓存区中删除对应文件
+            bufferRm.rmFile(addFile.getName());
+            bufferRm.save();
+        } else {
+            // 写入缓冲区
+            byte[] contents = Utils.readContents(addFile);
+            bufferAdd.add(addFile.getName(), contents);
+            // 再次序列化缓冲区
+            bufferAdd.save();
+        }
     }
 
     // commit辅助方法

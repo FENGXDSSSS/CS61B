@@ -35,6 +35,10 @@ public class BufferRm implements Buffer, Iterable<String> {
         return buffer.contains(fileKey);
     }
 
+    public void rmFile(String fileName) {
+        buffer.remove(fileName);
+    }
+
     @Override
     public void showContain() {
         System.out.print(this.toString());
