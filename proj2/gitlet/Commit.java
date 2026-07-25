@@ -22,43 +22,43 @@ public class Commit implements Serializable {
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
-    // ÓÉÓÚÌá½»Ò»µ©½¨Á¢¾ÍÎŞºóĞø¸ü¸Ä£¬ËùÒÔ¹¹ÔìÖ®³õ¾Í¿ÉĞòÁĞ»¯
-    // stackedBlob1 ÔÚinitÃüÁîÖĞÎªnull
+    // ç”±äºæäº¤ä¸€æ—¦å»ºç«‹å°±æ— åç»­æ›´æ”¹ï¼Œæ‰€ä»¥æ„é€ ä¹‹åˆå°±å¯åºåˆ—åŒ–
+    // stackedBlob1 åœ¨initå‘½ä»¤ä¸­ä¸ºnull
     public Commit(String message, String author, long time, String last, Map<String, String> stackedBlob1) {
-        // ÏûÏ¢
+        // æ¶ˆæ¯
         this.message = message;
-        // Ê±¼ä´Á
+        // æ—¶é—´æˆ³
         this.timestemp = time;
 
-        // lastÌá½»
+        // lastæäº¤
         this.last = last;
 
-        // Blob×·×ÙÓ³Éä
+        // Blobè¿½è¸ªæ˜ å°„
 
         if (stackedBlob1 != null) {
             this.stackedBlob = new TreeMap<>();
             this.stackedBlob.putAll(stackedBlob1);
         }
-        // Ó³Éä
+        // æ˜ å°„
         this.author = author;
-        // hash¼ÆËã
+        // hashè®¡ç®—
         byte[] stackStr = Utils.serialize(stackedBlob);
         this.sha1 = Utils.sha1(message, author, String.valueOf(timestemp), last, stackStr);
 
     }
     /** The message of this Commit. */
 
-    // »ñÈ¡sha1Öµ
+    // è·å–sha1å€¼
     public String getSha1() {
         return sha1;
     }
 
-    // »ñÈ¡ÉÏÒ»´ÎÌá½»
+    // è·å–ä¸Šä¸€æ¬¡æäº¤
     public String getLast() {
         return last;
     }
 
-    // »ñÈ¡×·×ÙÄ¿Â¼
+    // è·å–è¿½è¸ªç›®å½•
     public Map<String, String> getStackedBlob() {
         if (stackedBlob == null) {
             return new HashMap<String, String>();
@@ -67,28 +67,28 @@ public class Commit implements Serializable {
         }
     }
 
-    // ÉèÖÃÎ´×·×ÙÃûµ¥
+    // è®¾ç½®æœªè¿½è¸ªåå•
     public void setUnstackedFile(String unstacked) {
         unstackedFile.add(unstacked);
     }
 
-    // ¸üĞÂµ±Ç°¹¤×÷Ä¿Â¼ÎÄ¼ş×´Ì¬
+    // æ›´æ–°å½“å‰å·¥ä½œç›®å½•æ–‡ä»¶çŠ¶æ€
     public void update() {
-        // »ñÈ¡ÎÄ¼şÁĞ±í
+        // è·å–æ–‡ä»¶åˆ—è¡¨
         File fileDir = Repository.CWD;
         File[] fileList = fileDir.listFiles();
 
         if (fileList != null) {
             for (File file : fileList) {
                 String fileName = file.getName();
-                // Èç¹û²»ÔÚ×·×ÙÁĞ±í
+                // å¦‚æœä¸åœ¨è¿½è¸ªåˆ—è¡¨
                 if (!containStacked(fileName)) {
                     unstackedFile.add(fileName);
                     continue;
                 }
-                // »ñÈ¡ÎÄ¼şÄÚÈİ
+                // è·å–æ–‡ä»¶å†…å®¹
                 byte[] fileContents = Utils.readContents(file);
-                // Èç¹ûÄÚÈİ²»Ò»ÖÂ
+                // å¦‚æœå†…å®¹ä¸ä¸€è‡´
                 if (!Arrays.equals(getStackedFileContents(fileName), fileContents)) {
                     unstackedFile.add(fileName);
                 }
@@ -101,12 +101,12 @@ public class Commit implements Serializable {
         Utils.writeObject(commitFile, this);
     }
 
-    // ÊÇ·ñ°üº¬Ö¸¶¨ÎÄ¼şkey
+    // æ˜¯å¦åŒ…å«æŒ‡å®šæ–‡ä»¶key
     public boolean containStacked(String fileKey) {
         return stackedBlob.containsKey(fileKey);
     }
 
-    // ¶ÁÎÄ¼ş
+    // è¯»æ–‡ä»¶
     public static Commit readFromFile(String sha1OfCommit) {
         File CommitFile = Utils.join(Repository.COMMIT_DIR, sha1OfCommit);
         if (!CommitFile.exists()) {
@@ -115,24 +115,24 @@ public class Commit implements Serializable {
         return Utils.readObject(CommitFile, Commit.class);
     }
 
-    // »ñÈ¡µ±Ç°Ê±¼ä´Á
+    // è·å–å½“å‰æ—¶é—´æˆ³
     private String getDate() {
         Date date = new Date(timestemp);
         SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         return formatter.format(date);
     }
 
-    // ÏûÏ¢messageÊÇ·ñÓëÖ¸¶¨ÏûÏ¢ÏàÍ¬
+    // æ¶ˆæ¯messageæ˜¯å¦ä¸æŒ‡å®šæ¶ˆæ¯ç›¸åŒ
     public boolean isEqualsMessage(String findMessage) {
         return findMessage.equals(this.message);
     }
 
-    // ÎÄ¼şÊÇ·ñ±»¸ú×Ù
+    // æ–‡ä»¶æ˜¯å¦è¢«è·Ÿè¸ª
     public boolean fileIsStacked(String fileName) {
         return stackedBlob.containsKey(fileName);
     }
 
-    // »ñµÃ¸úÖ¸¶¨µÄ×·×ÙÎÄ¼şÄÚÈİ
+    // è·å¾—è·ŸæŒ‡å®šçš„è¿½è¸ªæ–‡ä»¶å†…å®¹
     public byte[] getStackedFileContents(String fileName) {
         String blobID = stackedBlob.get(fileName);
         Blob thisBlob = Blob.readFromFile(blobID);
@@ -143,13 +143,13 @@ public class Commit implements Serializable {
         return unstackedFile;
     }
 
-    // ÊÇ·ñÎ´¸ú×Ù
+    // æ˜¯å¦æœªè·Ÿè¸ª
     public boolean isUnstacked() {
-        // ÊÇ¿Õ·µ»Øtrue
+        // æ˜¯ç©ºè¿”å›true
         return unstackedFile.isEmpty();
     }
 
-    // ×·×ÙÁĞ±íĞ´ÈëÎÄ¼ş
+    // è¿½è¸ªåˆ—è¡¨å†™å…¥æ–‡ä»¶
     public void writeFilesFromStacked() {
         for (String fileName : stackedBlob.keySet()) {
             File file = Utils.join(Repository.CWD, fileName);

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.*;
 
 public class BufferAdd implements Buffer, Iterable<String> {
-    // 所有数据结构统一在构造函数里存一次盘, 只有在init命令里才执行
+    // 鎵�鏈夋暟鎹粨鏋勭粺涓�鍦ㄦ瀯閫犲嚱鏁伴噷瀛樹竴娆＄洏, 鍙湁鍦╥nit鍛戒护閲屾墠鎵ц
     public BufferAdd() {
         buffer = new HashMap<>();
         save();
@@ -56,7 +56,7 @@ public class BufferAdd implements Buffer, Iterable<String> {
     public String toString() {
         StringBuilder message = new StringBuilder("=== Staged Files ===\n");
         List<String> keySet = new ArrayList<>(buffer.keySet());
-        // 字母排序
+        // 瀛楁瘝鎺掑簭
         Collections.sort(keySet);
         for (String fileName : keySet) {
             message.append(fileName).append("\n");

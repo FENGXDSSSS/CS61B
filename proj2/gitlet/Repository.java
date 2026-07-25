@@ -30,17 +30,17 @@ public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    // ¶ÔÏóÄ¿Â¼
+    // å¯¹è±¡ç›®å½•
     public static final File OBJECT_DIR = join(GITLET_DIR, "object");
     public static final File COMMIT_DIR = join(OBJECT_DIR, "commit");
     public static final File BLOB_DIR = join(GITLET_DIR, "blob");
-    // »º´æÄ¿Â¼
+    // ç¼“å­˜ç›®å½•
     public static final File BUFFER_DIR = join(GITLET_DIR, "buffer");
-    // ·ÖÖ§Ä¿Â¼
+    // åˆ†æ”¯ç›®å½•
     public static final File BRANCH_DIR = join(GITLET_DIR, "branch");
     /* TODO: fill in the rest of this class. */
     public static void init() {
-        // ´´½¨Ä¿Â¼
+        // åˆ›å»ºç›®å½•
         if (!GITLET_DIR.mkdir()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             return;
@@ -51,46 +51,46 @@ public class Repository {
         }
         BUFFER_DIR.mkdir();
         BRANCH_DIR.mkdir();
-        // ³õÊ¼»¯ÓÃ»§Ãû£¬´ıÍêÉÆ
-            // ÓÃ»§Ãû¶¨ÒåÒÆ³ö·½·¨
-            // ÏÂ´Îµ÷ÓÃgitlet£¬ÓÃ»§Ãû²»»á±£´æ£¬ÖµÎªnull
-        // ³õÊ¼»¯¸÷²¿¼ş
-        // ³õÊ¼Ìá½»
-        // »ñÈ¡µ±Ç°Ê±¼ä´Ánew Date().getTime();
+        // åˆå§‹åŒ–ç”¨æˆ·åï¼Œå¾…å®Œå–„
+            // ç”¨æˆ·åå®šä¹‰ç§»å‡ºæ–¹æ³•
+            // ä¸‹æ¬¡è°ƒç”¨gitletï¼Œç”¨æˆ·åä¸ä¼šä¿å­˜ï¼Œå€¼ä¸ºnull
+        // åˆå§‹åŒ–å„éƒ¨ä»¶
+        // åˆå§‹æäº¤
+        // è·å–å½“å‰æ—¶é—´æˆ³new Date().getTime();
         Commit initCommit = new Commit("initial commit", userName, 0, " ", null);
         initCommit.save();
-        // ³õÊ¼»¯·ÖÖ§£¬½«µ±Ç°Ìá½»ÄÉÈë³õÊ¼»¯·ÖÖ§£¬³õÊ¼·ÖÖ§Îªmaster
-        // ·ÖÖ§Àà¾ßÓĞHEADÊôĞÔ£¬´æ·ÅinitCommit hash£¬ ´ËÊ± HEAD = initCommit.getSha1
-        // ·ÖÖ§ÀàÒ²¾ßÓĞcurrentBranchÊôĞÔ£¬´æ·Åµ±Ç°·ÖÖ§Â·ÏßµÄÃû³Æ£¬´ËÊ±currentBranch = "master"
-        // ¹¹ÔìÊ±×Ô¶¯ĞòÁĞ»¯½øÓ²ÅÌ, Í¨¹ıUtils.join(Repository.BRANCH_DIR, "branch")µØÖ·ÖØĞÂ·´ĞòÁĞ»¯²Ù×÷
+        // åˆå§‹åŒ–åˆ†æ”¯ï¼Œå°†å½“å‰æäº¤çº³å…¥åˆå§‹åŒ–åˆ†æ”¯ï¼Œåˆå§‹åˆ†æ”¯ä¸ºmaster
+        // åˆ†æ”¯ç±»å…·æœ‰HEADå±æ€§ï¼Œå­˜æ”¾initCommit hashï¼Œ æ­¤æ—¶ HEAD = initCommit.getSha1
+        // åˆ†æ”¯ç±»ä¹Ÿå…·æœ‰currentBranchå±æ€§ï¼Œå­˜æ”¾å½“å‰åˆ†æ”¯è·¯çº¿çš„åç§°ï¼Œæ­¤æ—¶currentBranch = "master"
+        // æ„é€ æ—¶è‡ªåŠ¨åºåˆ—åŒ–è¿›ç¡¬ç›˜, é€šè¿‡Utils.join(Repository.BRANCH_DIR, "branch")åœ°å€é‡æ–°ååºåˆ—åŒ–æ“ä½œ
         Branch branch = new Branch(initCommit.getSha1());
-        // ³õÊ¼»¯»º´æÇø
+        // åˆå§‹åŒ–ç¼“å­˜åŒº
         BufferAdd bufferadd = new BufferAdd();
         BufferRm bufferrm = new BufferRm();
-        // ´æÅÌ
+        // å­˜ç›˜
         branch.save();
         bufferadd.save();
         bufferrm.save();
     }
 
     public static void add(String fileName) {
-        // Ğ´ÈëÒªÌí¼ÓµÄÎÄ¼şµØÖ·
+        // å†™å…¥è¦æ·»åŠ çš„æ–‡ä»¶åœ°å€
         File addFile = Utils.join(CWD, fileName);
 
         if (!addFile.exists()) {
             System.out.println("File does not exist.");
             return;
         }
-        // ·´ĞòÁĞ»¯»º³åÇø(Add)
+        // ååºåˆ—åŒ–ç¼“å†²åŒº(Add)
         BufferAdd bufferAdd = BufferAdd.readFromFile();
-        // Ğ´Èë»º³åÇø
+        // å†™å…¥ç¼“å†²åŒº
         byte[] contents = Utils.readContents(addFile);
         bufferAdd.add(addFile.getName(), contents);
-        // ÔÙ´ÎĞòÁĞ»¯»º³åÇø
+        // å†æ¬¡åºåˆ—åŒ–ç¼“å†²åŒº
         bufferAdd.save();
     }
 
-    // commit¸¨Öú·½·¨
+    // commitè¾…åŠ©æ–¹æ³•
 
     private static boolean isBlankMessage(String message) {
         return message.isEmpty() || message.trim().isEmpty();
@@ -101,18 +101,18 @@ public class Repository {
         // stacked (Map<File, String> Map-> fileName, BlobHash)
         // buffer (Map<File, byte[]>) create-> Blob
         Map<String, String> updatedStacked = current.getStackedBlob();
-        // ¸üĞÂĞŞ¸ÄµÄÎÄ¼ş»òĞÂ½¨µÄÎÄ¼şµÄ×·×ÙÁĞ±í£¬ĞèÒª´´½¨BlobÊµÀı²¢ĞòÁĞ»¯Ğ´ÈëÓ²ÅÌ
+        // æ›´æ–°ä¿®æ”¹çš„æ–‡ä»¶æˆ–æ–°å»ºçš„æ–‡ä»¶çš„è¿½è¸ªåˆ—è¡¨ï¼Œéœ€è¦åˆ›å»ºBlobå®ä¾‹å¹¶åºåˆ—åŒ–å†™å…¥ç¡¬ç›˜
         for (String key : bufferAdd) {
             Blob tempBlob = new Blob(key, bufferAdd.getContents(key));
             tempBlob.save();
             updatedStacked.put(key, tempBlob.getSha1());
         }
-        // ¸üĞÂÉ¾³ıµÄÎÄ¼ş×·×ÙÁĞ±í£¬ÎŞĞè´´½¨ĞÂµÄBlobÊµÀıÒ²ÎŞĞèĞòÁĞ»¯Ğ´ÈëÓ²ÅÌ
+        // æ›´æ–°åˆ é™¤çš„æ–‡ä»¶è¿½è¸ªåˆ—è¡¨ï¼Œæ— éœ€åˆ›å»ºæ–°çš„Blobå®ä¾‹ä¹Ÿæ— éœ€åºåˆ—åŒ–å†™å…¥ç¡¬ç›˜
         for (String key : bufferRm) {
-            // ÕâÖ»ÊÇÌá½»µÄ¸üĞÂ×·×ÙÁĞ±íµÄ·½·¨£¬ÈçÉ¾³ıµÄÎÄ¼şÎ´±»×·×Ù²¢Î´»º´æµÄ¼ì²âÔÚremove·½·¨ÖĞÊµÏÖ
+            // è¿™åªæ˜¯æäº¤çš„æ›´æ–°è¿½è¸ªåˆ—è¡¨çš„æ–¹æ³•ï¼Œå¦‚åˆ é™¤çš„æ–‡ä»¶æœªè¢«è¿½è¸ªå¹¶æœªç¼“å­˜çš„æ£€æµ‹åœ¨removeæ–¹æ³•ä¸­å®ç°
             updatedStacked.remove(key);
         }
-        // ¸üĞÂÍê±ÏÇå¿Õ»º´æ
+        // æ›´æ–°å®Œæ¯•æ¸…ç©ºç¼“å­˜
         bufferAdd.clear();
         bufferRm.clear();
 
@@ -120,10 +120,10 @@ public class Repository {
     }
 
     public static void commit(String message) {
-        // »º´æÇøÎÄ¼şÔØÈë
+        // ç¼“å­˜åŒºæ–‡ä»¶è½½å…¥
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
-        // ²î´í¿ØÖÆ
+        // å·®é”™æ§åˆ¶
         if (bufferAdd.isEmpty() & bufferRm.isEmpty()) {
             System.out.println("No changes added to the commit.");
             return;
@@ -132,7 +132,7 @@ public class Repository {
             System.out.println("Please enter a commit message.");
             return;
         }
-        // ·ÖÖ§ÎÄ¼şÔØÈë
+        // åˆ†æ”¯æ–‡ä»¶è½½å…¥
         /* branch:
                 branch (Map<String, String> branchName, commitHash)
                 HEAD (String -> commitHash)Commit
@@ -140,19 +140,19 @@ public class Repository {
         */
         Branch branch = Branch.readFromFile();
         String Head = branch.getHEAD();
-        // µ±Ç°commit -> Head ÔØÈë
+        // å½“å‰commit -> Head è½½å…¥
         Commit currentCommit = Commit.readFromFile(Head);
-        // ¸üĞÂ×·×ÙÁĞ±í
+        // æ›´æ–°è¿½è¸ªåˆ—è¡¨
         Map<String, String> stacked = updateStacked(currentCommit, bufferAdd, bufferRm);
-        // ĞÂ½¨commitÊµÀı
+        // æ–°å»ºcommitå®ä¾‹
         Commit newCommit = new Commit(message, userName, new Date().getTime(), Head, stacked);
         Head = newCommit.getSha1();
-        // ÖØĞÂÉèÖÃµ½µ±Ç°·ÖÖ§µ±Ç°Ö¸ÕëÉÏ
+        // é‡æ–°è®¾ç½®åˆ°å½“å‰åˆ†æ”¯å½“å‰æŒ‡é’ˆä¸Š
         branch.setHEAD(Head);
         branch.updateCurBranch(Head);
-        /* ¸÷²¿¼şÒÀ´ËÖØĞÂĞòÁĞ»¯(Ë­±»¸ü¸ÄË­ĞòÁĞ»¯)
-            1.»º³åÇø×´Ì¬±»Çå¿Õ£¬ËìĞèÒªÔÙ´ÎĞòÁĞ»¯¸üĞÂ×´Ì¬
-            2.·ÖÖ§ÖĞHEAD×´Ì¬±»ĞŞ¸Ä£¬ËìĞèÒªÔÙ´ÎĞòÁĞ»¯ÒÔ¸üĞÂ×´Ì¬
+        /* å„éƒ¨ä»¶ä¾æ­¤é‡æ–°åºåˆ—åŒ–(è°è¢«æ›´æ”¹è°åºåˆ—åŒ–)
+            1.ç¼“å†²åŒºçŠ¶æ€è¢«æ¸…ç©ºï¼Œé‚éœ€è¦å†æ¬¡åºåˆ—åŒ–æ›´æ–°çŠ¶æ€
+            2.åˆ†æ”¯ä¸­HEADçŠ¶æ€è¢«ä¿®æ”¹ï¼Œé‚éœ€è¦å†æ¬¡åºåˆ—åŒ–ä»¥æ›´æ–°çŠ¶æ€
         */
         newCommit.save();
         bufferAdd.save();
@@ -163,13 +163,13 @@ public class Repository {
     public static void remove(String filename) {
         File fileName = Utils.join(CWD, filename);
         String fileNameString = fileName.getPath();
-        /*  1.ÏÈ²é»º´æÇø(add)£¬ÓĞµÄ»°´Ó»º´æÇø(add)ÖĞÉ¾³ı
-            2.ÔÙ²éµ±Ç°·ÖÖ§µ±Ç°Ìá½»µÄ×·×ÙÁĞ±í£¬ÓĞµÄ»°ÏÈ´æÈë»º´æÇø(rm)£¬Èç¹û´ËÎÄ¼şÔÚ¹¤×÷Ä¿Â¼ÖĞ£¬É¾³ı¹¤×÷Ä¿Â¼ÖĞµÄÄ¿±êÎÄ¼ş;
-              ÔÚ´Ë·½·¨ÖĞ²»¼±×Å¸üĞÂ×·×ÙÁĞ±í£¬ÒòÎª¸üĞÂ×·×ÙÁĞ±íµÄ×´Ì¬Í³Ò»¼¯ÖĞµ½commit·½·¨
-            3.Èç¹ûÁ½ÖÖÇé¿ö²»Âú×ã½øĞĞ²î´í¿ØÖÆ
+        /*  1.å…ˆæŸ¥ç¼“å­˜åŒº(add)ï¼Œæœ‰çš„è¯ä»ç¼“å­˜åŒº(add)ä¸­åˆ é™¤
+            2.å†æŸ¥å½“å‰åˆ†æ”¯å½“å‰æäº¤çš„è¿½è¸ªåˆ—è¡¨ï¼Œæœ‰çš„è¯å…ˆå­˜å…¥ç¼“å­˜åŒº(rm)ï¼Œå¦‚æœæ­¤æ–‡ä»¶åœ¨å·¥ä½œç›®å½•ä¸­ï¼Œåˆ é™¤å·¥ä½œç›®å½•ä¸­çš„ç›®æ ‡æ–‡ä»¶;
+              åœ¨æ­¤æ–¹æ³•ä¸­ä¸æ€¥ç€æ›´æ–°è¿½è¸ªåˆ—è¡¨ï¼Œå› ä¸ºæ›´æ–°è¿½è¸ªåˆ—è¡¨çš„çŠ¶æ€ç»Ÿä¸€é›†ä¸­åˆ°commitæ–¹æ³•
+            3.å¦‚æœä¸¤ç§æƒ…å†µä¸æ»¡è¶³è¿›è¡Œå·®é”™æ§åˆ¶
         */
-        // Çé¿ö1
-        // »º´æÇøÎÄ¼şÔØÈë
+        // æƒ…å†µ1
+        // ç¼“å­˜åŒºæ–‡ä»¶è½½å…¥
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
         int flag = 0;
@@ -177,11 +177,11 @@ public class Repository {
             bufferAdd.remove(fileNameString);
             flag += 1;
         }
-        // Çé¿ö2
-        // ·ÖÖ§ÎÄ¼şÔØÈë, ·ÖÖ§ÎÄ¼şÖ»×ö²é¿´²Ù×÷ÎŞĞè¸üĞÂ×´Ì¬
+        // æƒ…å†µ2
+        // åˆ†æ”¯æ–‡ä»¶è½½å…¥, åˆ†æ”¯æ–‡ä»¶åªåšæŸ¥çœ‹æ“ä½œæ— éœ€æ›´æ–°çŠ¶æ€
         Branch branch = Branch.readFromFile();
         String Head = branch.getHEAD();
-        // µ±Ç°·ÖÖ§µ±Ç°Ö¸ÏòµÄcommitÔØÈë
+        // å½“å‰åˆ†æ”¯å½“å‰æŒ‡å‘çš„commitè½½å…¥
         Commit currentCommit = Commit.readFromFile(Head);
         if (currentCommit.containStacked(fileNameString)) {
             fileName.delete();
@@ -192,36 +192,36 @@ public class Repository {
             System.out.println("No reason to remove the file.");
             return;
         }
-        // »º³åÇøÔÙ´ÎĞòÁĞ»¯
+        // ç¼“å†²åŒºå†æ¬¡åºåˆ—åŒ–
         bufferAdd.save();
         bufferRm.save();
     }
 
-    // log()¸¨Öú·½·¨£¬°ïÖúÊµÏÖdfs
+    // log()è¾…åŠ©æ–¹æ³•ï¼Œå¸®åŠ©å®ç°dfs
     private static void logHelper(String point) {
         if (point.equals(" ")) {
             return;
         }
-        // commitÔØÈë
+        // commitè½½å…¥
         Commit currentCommit = Commit.readFromFile(point);
         System.out.println(currentCommit.toString());
         logHelper(currentCommit.getLast());
     }
 
     public static void log() {
-        // µ±Ç°·ÖÖ§ÔØÈë
+        // å½“å‰åˆ†æ”¯è½½å…¥
         Branch branch = Branch.readFromFile();
         String Head = branch.getHEAD();
 
         logHelper(Head);
     }
-    // È«¾Ölog
+    // å…¨å±€log
     public static void globalLog(){
         List<String> commitList;
         commitList = Utils.plainFilenamesIn(COMMIT_DIR);
         if (commitList != null) {
             for (String dir : commitList){
-                // ÔØÈë
+                // è½½å…¥
                 Commit commitPrintLog = Commit.readFromFile(dir);
                 System.out.println(commitPrintLog.toString());
             }
@@ -242,18 +242,18 @@ public class Repository {
     }
 
     public static void status() {
-        // ²Ù×÷ÏÈÔØÈë
+        // æ“ä½œå…ˆè½½å…¥
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
         Branch branch = Branch.readFromFile();
-        // ´òÓ¡×´Ì¬
+        // æ‰“å°çŠ¶æ€
         branch.showCurrentBranch();
         bufferAdd.showContain();
         bufferRm.showContain();
     }
 
     public static void checkoutFile(String fileName) {
-        // ÔØÈëµ½ÄÚ´æ
+        // è½½å…¥åˆ°å†…å­˜
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         File fileDir = Utils.join(CWD, fileName);
         Branch branch = Branch.readFromFile();
@@ -271,7 +271,7 @@ public class Repository {
         }
     }
 
-    //¸¨Öú·½·¨ ¡ı
+    //è¾…åŠ©æ–¹æ³• â†“
     private static Commit getThatCommit(String commitID) {
         Commit targetCommit = null;
         int flag = 0;
@@ -291,7 +291,7 @@ public class Repository {
     }
 
     public static void checkoutCommitFile(String commitID, String fileName) {
-        // ÒÀ¾ÉÏÈÔØÈëÕâÒ»¿é
+        // ä¾æ—§å…ˆè½½å…¥è¿™ä¸€å—
         File fileDir = Utils.join(CWD, fileName);
         Branch branch = Branch.readFromFile();
         Commit thatCommit = getThatCommit(commitID);
@@ -309,10 +309,10 @@ public class Repository {
     }
 
     public static void checkoutBranch(String branchName) {
-        // ÔØÈëËùÓĞ¹¤×÷Ä¿Â¼ÏÂµÄÎÄ¼ş·ÇÎÄ¼ş¼Ğ
+        // è½½å…¥æ‰€æœ‰å·¥ä½œç›®å½•ä¸‹çš„æ–‡ä»¶éæ–‡ä»¶å¤¹
         File fileDir = Utils.join(CWD);
         File[] fileList = fileDir.listFiles();
-        // ÒÀ¾É
+        // ä¾æ—§
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         Branch branch = Branch.readFromFile();
         if (branch.isCurrentBranch(branchName)) {
@@ -326,7 +326,7 @@ public class Repository {
             Commit curCommit = Commit.readFromFile(commitSha1);
             String targetHead = branch.getTargetHead(branchName);
             Commit targetCommit = Commit.readFromFile(targetHead);
-            // ¸üĞÂ×´Ì¬
+            // æ›´æ–°çŠ¶æ€
             curCommit.update();
             for (String fileName : curCommit.getUnstackedFile()) {
                 if (targetCommit.fileIsStacked(fileName)) {
@@ -334,9 +334,9 @@ public class Repository {
                     return;
                 }
             }
-            // ÇĞ»»·ÖÖ§
+            // åˆ‡æ¢åˆ†æ”¯
             branch.goToBranch(branchName);
-            // É¾³ıµ±Ç°Ä¿Â¼µÄËùÓĞÎÄ¼ş
+            // åˆ é™¤å½“å‰ç›®å½•çš„æ‰€æœ‰æ–‡ä»¶
             if (fileList != null) {
                 for (File file : fileList) {
                     if (curCommit.fileIsStacked(file.getName())) {
@@ -344,7 +344,7 @@ public class Repository {
                     }
                 }
             }
-            // Çå³ıBufferAddÓ³Éä±í
+            // æ¸…é™¤BufferAddæ˜ å°„è¡¨
             bufferAdd.clear();
             bufferAdd.save();
             targetCommit.writeFilesFromStacked();
@@ -352,7 +352,7 @@ public class Repository {
     }
 
     public static void branch(String branchName) {
-        // È¡³öbranch¶ÁÈëÄÚ´æ
+        // å–å‡ºbranchè¯»å…¥å†…å­˜
         Branch branch = Branch.readFromFile();
         if (! branch.createBranch(branchName)) {
             return;
@@ -360,7 +360,7 @@ public class Repository {
     }
 
     public static void rmBranch(String branchName) {
-        // È¡³öbranchÈëÄÚ´æ
+        // å–å‡ºbranchå…¥å†…å­˜
         Branch branch = Branch.readFromFile();
         if (branch.curBranchIsContained(branchName)) {
             System.out.println("A branch with that name does not exist.");
@@ -391,7 +391,7 @@ public class Repository {
     public static void merge(String branchName) {
 
     }
-    // Çå¿Õ¹¤×÷Ä¿Â¼
+    // æ¸…ç©ºå·¥ä½œç›®å½•
     private static void rmDir() {
         for (File file : CWD.listFiles()) {
             if (!file.isDirectory()) {
