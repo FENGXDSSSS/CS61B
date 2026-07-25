@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public interface Buffer extends Serializable {
 
-    public void clear();
+    void clear();
 
-    public void save();
+    void save();
 
-    public boolean isEmpty();
+    boolean isEmpty();
 
-    public boolean contain(String fileKey);
+    boolean contain(String fileKey);
 
-    public void showContain();
+    void showContain();
 }

@@ -8,17 +8,17 @@ import java.util.Map;
 
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
+
 
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
+ *
  *  does at a high level.
  *
  *  @author TODO
  */
 public class Repository {
     /**
-     * TODO: add instance variables here.
+     *
      *
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
@@ -38,11 +38,12 @@ public class Repository {
     public static final File BUFFER_DIR = join(GITLET_DIR, "buffer");
     // 分支目录
     public static final File BRANCH_DIR = join(GITLET_DIR, "branch");
-    /* TODO: fill in the rest of this class. */
+
     public static void init() {
         // 创建目录
         if (!GITLET_DIR.mkdir()) {
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.out.println("A Gitlet version-control " +
+                    "system already exists in the current directory.");
             return;
         }
         if (OBJECT_DIR.mkdir()) {
@@ -97,7 +98,7 @@ public class Repository {
     }
 
     private static Map<String, String> updateStacked
-                        (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
+            (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
         // stacked (Map<File, String> Map-> fileName, BlobHash)
         // buffer (Map<File, byte[]>) create-> Blob
         Map<String, String> updatedStacked = current.getStackedBlob();
@@ -139,17 +140,17 @@ public class Repository {
                 currentBranch (String -> branchName)
         */
         Branch branch = Branch.readFromFile();
-        String Head = branch.getHEAD();
+        String head = branch.getHEAD();
         // 当前commit -> Head 载入
-        Commit currentCommit = Commit.readFromFile(Head);
+        Commit currentCommit = Commit.readFromFile(head);
         // 更新追踪列表
         Map<String, String> stacked = updateStacked(currentCommit, bufferAdd, bufferRm);
         // 新建commit实例
-        Commit newCommit = new Commit(message, userName, new Date().getTime(), Head, stacked);
-        Head = newCommit.getSha1();
+        Commit newCommit = new Commit(message, userName, new Date().getTime(), head, stacked);
+        head = newCommit.getSha1();
         // 重新设置到当前分支当前指针上
-        branch.setHEAD(Head);
-        branch.updateCurBranch(Head);
+        branch.setHEAD(head);
+        branch.updateCurBranch(head);
         /* 各部件依此重新序列化(谁被更改谁序列化)
             1.缓冲区状态被清空，遂需要再次序列化更新状态
             2.分支中HEAD状态被修改，遂需要再次序列化以更新状态
@@ -216,11 +217,11 @@ public class Repository {
         logHelper(Head);
     }
     // 全局log
-    public static void globalLog(){
+    public static void globalLog() {
         List<String> commitList;
         commitList = Utils.plainFilenamesIn(COMMIT_DIR);
         if (commitList != null) {
-            for (String dir : commitList){
+            for (String dir : commitList) {
                 // 载入
                 Commit commitPrintLog = Commit.readFromFile(dir);
                 System.out.println(commitPrintLog.toString());
@@ -228,7 +229,7 @@ public class Repository {
         }
     }
 
-    public static void find(String message){
+    public static void find(String message) {
         List<String> commitList;
         commitList = Utils.plainFilenamesIn(COMMIT_DIR);
         if (commitList != null) {
@@ -257,8 +258,8 @@ public class Repository {
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         File fileDir = Utils.join(CWD, fileName);
         Branch branch = Branch.readFromFile();
-        String Head = branch.getHEAD();
-        Commit curCommit = Commit.readFromFile(Head);
+        String head = branch.getHEAD();
+        Commit curCommit = Commit.readFromFile(head);
 
         /*if (bufferAdd.contain(fileName)) {
             Utils.writeContents(fileDir, (Object) bufferAdd.getContents(fileName));
@@ -318,7 +319,7 @@ public class Repository {
         if (branch.isCurrentBranch(branchName)) {
             System.out.println("No need to checkout the current branch.");
             return;
-        } else if (branch.curBranchIsContained(branchName)){
+        } else if (branch.curBranchIsContained(branchName)) {
             System.out.println("No such branch exists.");
             return;
         } else {
@@ -330,7 +331,8 @@ public class Repository {
             curCommit.update();
             for (String fileName : curCommit.getUnstackedFile()) {
                 if (targetCommit.fileIsStacked(fileName)) {
-                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.out.println("There is an untracked file in the way;" +
+                            " delete it, or add and commit it first.");
                     return;
                 }
             }
@@ -354,7 +356,7 @@ public class Repository {
     public static void branch(String branchName) {
         // 取出branch读入内存
         Branch branch = Branch.readFromFile();
-        if (! branch.createBranch(branchName)) {
+        if (!branch.createBranch(branchName)) {
             return;
         }
     }
@@ -380,7 +382,9 @@ public class Repository {
         BufferAdd bufferAdd = BufferAdd.readFromFile();
 
         Commit targetCommit = getThatCommit(commitID);
-        if (targetCommit == null) { System.out.println("No commit with that id exists."); return; }
+        if (targetCommit == null) {
+            System.out.println("No commit with that id exists."); return;
+        }
         rmDir();
         targetCommit.writeFilesFromStacked();
         branch.updateCurBranch(targetCommit.getSha1());

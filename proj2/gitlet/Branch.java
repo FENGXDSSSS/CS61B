@@ -40,8 +40,8 @@ public class Branch implements Serializable {
 
     // 保存文件
     public void save() {
-        File BranchFile = Utils.join(Repository.BRANCH_DIR, "branch");
-        Utils.writeObject(BranchFile, this);
+        File branchFile = Utils.join(Repository.BRANCH_DIR, "branch");
+        Utils.writeObject(branchFile, this);
     }
 
     // 获取当前分支头节点
@@ -78,10 +78,11 @@ public class Branch implements Serializable {
         Collections.sort(keySet);
         for (String name : keySet) {
             // 如果当前与currentBranch匹配标记该分支
-            if (Objects.equals(name, currentBranch))
+            if (Objects.equals(name, currentBranch)) {
                 branchMessage.append("*").append(name).append("\n");
-            else
+            } else {
                 branchMessage.append(name).append("\n");
+            }
         }
         branchMessage.append("\n");
         return branchMessage.toString();
@@ -107,8 +108,8 @@ public class Branch implements Serializable {
 
     // 读取文件
     public static Branch readFromFile() {
-        File BranchFile = Utils.join(Repository.BRANCH_DIR, "branch");
-        return Utils.readObject(BranchFile, Branch.class);
+        File branchFile = Utils.join(Repository.BRANCH_DIR, "branch");
+        return Utils.readObject(branchFile, Branch.class);
     }
 
     // branchMap<String -> branchName, String -> commitSha1>

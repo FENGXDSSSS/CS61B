@@ -67,8 +67,8 @@ public class BufferAdd implements Buffer, Iterable<String> {
     }
 
     public static BufferAdd readFromFile()   {
-        File BufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferAdd");
-        return Utils.readObject(BufferAddFile, BufferAdd.class);
+        File bufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferAdd");
+        return Utils.readObject(bufferAddFile, BufferAdd.class);
     }
 
     private Map<String, byte[]> buffer;

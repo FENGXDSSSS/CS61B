@@ -1,10 +1,8 @@
 package gitlet;
 
 // TODO: any imports you need here
-
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.time.Instant;
 import java.io.File;
 import java.io.Serializable;
 
@@ -16,15 +14,14 @@ import java.io.Serializable;
  */
 public class Commit implements Serializable {
     /**
-     * TODO: add instance variables here.
-     *
      * List all instance variables of the Commit class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
     // 由于提交一旦建立就无后续更改，所以构造之初就可序列化
     // stackedBlob1 在init命令中为null
-    public Commit(String message, String author, long time, String last, Map<String, String> stackedBlob1) {
+    public Commit(String message, String author,
+                  long time, String last, Map<String, String> stackedBlob1) {
         // 消息
         this.message = message;
         // 时间戳
@@ -108,11 +105,11 @@ public class Commit implements Serializable {
 
     // 读文件
     public static Commit readFromFile(String sha1OfCommit) {
-        File CommitFile = Utils.join(Repository.COMMIT_DIR, sha1OfCommit);
-        if (!CommitFile.exists()) {
+        File commitFile = Utils.join(Repository.COMMIT_DIR, sha1OfCommit);
+        if (!commitFile.exists()) {
             return null;
         }
-        return Utils.readObject(CommitFile, Commit.class);
+        return Utils.readObject(commitFile, Commit.class);
     }
 
     // 获取当前时间戳
@@ -174,5 +171,5 @@ public class Commit implements Serializable {
     private String last;
     private String author;
     private String sha1;
-    /* TODO: fill in the rest of this class. */
+
 }

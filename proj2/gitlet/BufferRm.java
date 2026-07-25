@@ -3,7 +3,7 @@ package gitlet;
 import java.io.File;
 import java.util.*;
 
-public class BufferRm implements Buffer, Iterable<String>{
+public class BufferRm implements Buffer, Iterable<String> {
     // 所有数据结构统一在构造函数里存一次盘, 只有在init命令里才执行
     public BufferRm() {
         buffer = new HashSet<>();
@@ -54,8 +54,8 @@ public class BufferRm implements Buffer, Iterable<String>{
     }
 
     public static BufferRm readFromFile() {
-        File BufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
-        return Utils.readObject(BufferAddFile, BufferRm.class);
+        File bufferRmFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
+        return Utils.readObject(bufferRmFile, BufferRm.class);
     }
 
     @Override

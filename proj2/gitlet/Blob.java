@@ -31,8 +31,8 @@ public class Blob implements Serializable {
     }
 
     public static Blob readFromFile(String sha1OfBlob) {
-        File BlobFile = Utils.join(Repository.BLOB_DIR, sha1OfBlob);
-        return Utils.readObject(BlobFile, Blob.class);
+        File blobFile = Utils.join(Repository.BLOB_DIR, sha1OfBlob);
+        return Utils.readObject(blobFile, Blob.class);
     }
 
     private String fileName;
