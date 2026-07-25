@@ -1,4 +1,4 @@
-//Binary Large Objectï¼ˆä¸­æ–‡é€šå¸¸ç¿»è¯‘ä¸ºï¼šäºŒè¿›åˆ¶å¤§åž‹å¯¹è±¡ï¼‰
+//Binary Large Object£¨ÖÐÎÄÍ¨³£·­ÒëÎª£º¶þ½øÖÆ´óÐÍ¶ÔÏó£©
 package gitlet;
 
 import java.io.File;
@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 public class Blob implements Serializable {
-    // åŒCommitä¸€æ—¦å»ºç«‹åŽç»­æ— éœ€æ›´æ”¹ï¼Œæž„é€ ä¹‹åˆå³å¯åºåˆ—åŒ–
+    // Í¬CommitÒ»µ©½¨Á¢ºóÐøÎÞÐè¸ü¸Ä£¬¹¹ÔìÖ®³õ¼´¿ÉÐòÁÐ»¯
     public Blob(String fileName, byte[] contents) {
         this.fileName = fileName;
         this.contents = Arrays.copyOf(contents, contents.length);

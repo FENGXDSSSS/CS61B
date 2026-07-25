@@ -1,12 +1,10 @@
 package gitlet;
 
-import jdk.jshell.execution.Util;
-
 import java.io.File;
 import java.util.*;
 
 public class BufferRm implements Buffer, Iterable<String>{
-    // 鎵�鏈夋暟鎹粨鏋勭粺涓�鍦ㄦ瀯閫犲嚱鏁伴噷瀛樹竴娆＄洏, 鍙湁鍦╥nit鍛戒护閲屾墠鎵ц
+    // 所有数据结构统一在构造函数里存一次盘, 只有在init命令里才执行
     public BufferRm() {
         buffer = new HashSet<>();
         save();
@@ -50,7 +48,7 @@ public class BufferRm implements Buffer, Iterable<String>{
     public String toString() {
         StringBuilder message = new StringBuilder("=== Staged Files ===\n");
         List<String> keySet = new ArrayList<>(buffer);
-        // 瀛楁瘝鎺掑簭
+        // 字母排序
         Collections.sort(keySet);
         for (String fileName : keySet) {
             message.append(fileName).append("\n");

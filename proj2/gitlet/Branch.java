@@ -6,7 +6,7 @@ import java.util.*;
 
 public class Branch implements Serializable {
 
-    // æ„é€ æ—¶ï¼Œä¼ å…¥ç¬¬ä¸€ä¸ªæäº¤å°†æ­¤æäº¤çº³å…¥åˆå§‹åˆ†æ”¯masterï¼Œå¹¶è®¾ç½®HEADä¸ºå½“å‰commit
+    // ¹¹ÔìÊ±£¬´«ÈëµÚÒ»¸öÌá½»½«´ËÌá½»ÄÉÈë³õÊ¼·ÖÖ§master£¬²¢ÉèÖÃHEADÎªµ±Ç°commit
     public Branch(String sha1Ofcommit) {
         branchMap = new HashMap<>();
         branchMap.put("master", sha1Ofcommit);
@@ -18,17 +18,17 @@ public class Branch implements Serializable {
         return branchMap.get(branchKey);
     }
 
-    // æäº¤æ—¶æ›´æ–°å½“å‰åˆ†æ”¯çš„æäº¤è¿½è¸ª
+    // Ìá½»Ê±¸üĞÂµ±Ç°·ÖÖ§µÄÌá½»×·×Ù
     public void updateCurBranch(String curHead) {
         branchMap.put(currentBranch, curHead);
     }
 
-    // åˆ†æ”¯æ˜¯å¦å·²åˆ›å»º
+    // ·ÖÖ§ÊÇ·ñÒÑ´´½¨
     public boolean curBranchIsContained(String branchName) {
         return branchMap.containsKey(branchName);
     }
 
-    // åˆ›å»ºåˆ†æ”¯
+    // ´´½¨·ÖÖ§
     public boolean createBranch(String branchName) {
         if (curBranchIsContained(branchName)) {
             System.out.println("A branch with that name already exists.");
@@ -38,46 +38,46 @@ public class Branch implements Serializable {
         return true;
     }
 
-    // ä¿å­˜æ–‡ä»¶
+    // ±£´æÎÄ¼ş
     public void save() {
         File BranchFile = Utils.join(Repository.BRANCH_DIR, "branch");
         Utils.writeObject(BranchFile, this);
     }
 
-    // è·å–å½“å‰åˆ†æ”¯å¤´èŠ‚ç‚¹
+    // »ñÈ¡µ±Ç°·ÖÖ§Í·½Úµã
     public String getHEAD() {
         return HEAD;
     }
 
-    // è®¾ç½®å½“å‰åˆ†æ”¯å¤´èŠ‚ç‚¹
+    // ÉèÖÃµ±Ç°·ÖÖ§Í·½Úµã
     public void setHEAD(String commitSha1) {
         HEAD = commitSha1;
     }
 
-    // æ˜¯å¦å½“å‰åˆ†æ”¯
+    // ÊÇ·ñµ±Ç°·ÖÖ§
     public boolean isCurrentBranch(String branchName) {
         return currentBranch.equals(branchName);
     }
 
-    // æ˜¾ç¤ºå½“å‰èŠ‚ç‚¹çŠ¶æ€
+    // ÏÔÊ¾µ±Ç°½Úµã×´Ì¬
     public void showCurrentBranch() {
         System.out.print(this.toString());
     }
 
-    // æ›´æ–°åˆ†æ”¯èŠ‚ç‚¹
+    // ¸üĞÂ·ÖÖ§½Úµã
     public void updateCurBranchHead(String commitID) {
         branchMap.put(currentBranch, commitID);
         HEAD = branchMap.get(currentBranch);
     }
 
-    // æ ¼å¼åŒ–è‡ªèº«æ•°æ®
+    // ¸ñÊ½»¯×ÔÉíÊı¾İ
     @Override
     public String toString() {
         StringBuilder branchMessage = new StringBuilder("=== Branches ===\n");
         List<String> keySet = new ArrayList<>(branchMap.keySet());
         Collections.sort(keySet);
         for (String name : keySet) {
-            // å¦‚æœå½“å‰ä¸currentBranchåŒ¹é…æ ‡è®°è¯¥åˆ†æ”¯
+            // Èç¹ûµ±Ç°ÓëcurrentBranchÆ¥Åä±ê¼Ç¸Ã·ÖÖ§
             if (Objects.equals(name, currentBranch))
                 branchMessage.append("*").append(name).append("\n");
             else
@@ -91,21 +91,21 @@ public class Branch implements Serializable {
         return branchMap.get(branchName);
     }
 
-    // åˆ‡æ¢åˆ†æ”¯, æ— éœ€å¤„ç†ä¸å­˜åœ¨åˆ†æ”¯, äº¤ç»™
+    // ÇĞ»»·ÖÖ§, ÎŞĞè´¦Àí²»´æÔÚ·ÖÖ§, ½»¸ø
     public void goToBranch(String branchName) {
-        // æ›´æ”¹å½“å‰åˆ†æ”¯å
-        // å–å‡ºç›®æ ‡åˆ†æ”¯çš„å½“å‰æäº¤èŠ‚ç‚¹
-        // æ›´è¯¥å½“å‰HEADæŒ‡å‘commitèŠ‚ç‚¹
+        // ¸ü¸Äµ±Ç°·ÖÖ§Ãû
+        // È¡³öÄ¿±ê·ÖÖ§µÄµ±Ç°Ìá½»½Úµã
+        // ¸ü¸Ãµ±Ç°HEADÖ¸Ïòcommit½Úµã
         currentBranch = branchName;
         HEAD = branchMap.get(currentBranch);
     }
 
-    // åˆ é™¤åˆ†æ”¯
+    // É¾³ı·ÖÖ§
     public void removeBranch(String branchName) {
         branchMap.remove(branchName);
     }
 
-    // è¯»å–æ–‡ä»¶
+    // ¶ÁÈ¡ÎÄ¼ş
     public static Branch readFromFile() {
         File BranchFile = Utils.join(Repository.BRANCH_DIR, "branch");
         return Utils.readObject(BranchFile, Branch.class);
@@ -113,8 +113,8 @@ public class Branch implements Serializable {
 
     // branchMap<String -> branchName, String -> commitSha1>
     private Map<String, String> branchMap;
-    // å½“å‰åˆ†æ”¯ï¼ˆåˆ†æ”¯åç§°ï¼‰
+    // µ±Ç°·ÖÖ§£¨·ÖÖ§Ãû³Æ£©
     private String currentBranch;
-    // å½“å‰åˆ†æ”¯çš„å½“å‰Commitï¼ˆcommit hashï¼‰
+    // µ±Ç°·ÖÖ§µÄµ±Ç°Commit£¨commit hash£©
     private String HEAD;
 }
