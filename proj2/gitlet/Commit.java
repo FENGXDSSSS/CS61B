@@ -30,6 +30,8 @@ public class Commit implements Serializable {
         // last提交
         this.last = last;
 
+        unstackedFile = new TreeSet<>();
+
         // Blob追踪映射
 
         if (stackedBlob1 != null) {
@@ -70,7 +72,7 @@ public class Commit implements Serializable {
     }
 
     // 更新当前工作目录文件状态
-    public void update() {
+    /*public void update() {
         // 获取文件列表
         File fileDir = Repository.CWD;
         File[] fileList = fileDir.listFiles();
@@ -91,7 +93,7 @@ public class Commit implements Serializable {
                 }
             }
         }
-    }
+    }*/
 
     public void save() {
         File commitFile = Utils.join(Repository.COMMIT_DIR, getSha1());

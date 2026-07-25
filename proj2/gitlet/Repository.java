@@ -339,6 +339,21 @@ public class Repository {
         }
     }
 
+    private static void update(Commit cur, Commit tar) {
+        File file;
+        for (String curf : cur.getStackedBlob().keySet()) {
+            if (!tar.containStacked(curf)) {
+                file = Utils.join(CWD, curf);
+                file.delete();
+            }
+        }
+
+        for (String tarf : tar.getStackedBlob().keySet()) {
+            file = Utils.join(CWD, tarf);
+            Utils.writeContents(file, tar.getStackedFileContents(tarf));
+        }
+    }
+
     public static void checkoutBranch(String branchName) {
         // 载入所有工作目录下的文件非文件夹
         File fileDir = Utils.join(CWD);
@@ -349,7 +364,7 @@ public class Repository {
         if (branch.isCurrentBranch(branchName)) {
             System.out.println("No need to checkout the current branch.");
             return;
-        } else if (branch.curBranchIsContained(branchName)) {
+        } else if (!branch.curBranchIsContained(branchName)) {
             System.out.println("No such branch exists.");
             return;
         } else {
@@ -358,9 +373,9 @@ public class Repository {
             String targetHead = branch.getTargetHead(branchName);
             Commit targetCommit = Commit.readFromFile(targetHead);
             // 更新状态
-            curCommit.update();
+            update(curCommit, targetCommit);
             for (String fileName : curCommit.getUnstackedFile()) {
-                if (targetCommit.fileIsStacked(fileName)) {
+                if (!targetCommit.fileIsStacked(fileName)) {
                     System.out.println("There is an untracked file in the way; "
                             + "delete it, or add and commit it first.");
                     return;
@@ -368,18 +383,12 @@ public class Repository {
             }
             // 切换分支
             branch.goToBranch(branchName);
-            // 删除当前目录的所有文件
-            if (fileList != null) {
-                for (File file : fileList) {
-                    if (curCommit.fileIsStacked(file.getName())) {
-                        file.delete();
-                    }
-                }
-            }
+
             // 清除BufferAdd映射表
             bufferAdd.clear();
             bufferAdd.save();
-            targetCommit.writeFilesFromStacked();
+            branch.save();
+
         }
     }
 
@@ -389,6 +398,8 @@ public class Repository {
         if (!branch.createBranch(branchName)) {
             return;
         }
+        // 记得保存
+        branch.save();
     }
 
     public static void rmBranch(String branchName) {
