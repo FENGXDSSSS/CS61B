@@ -140,6 +140,21 @@ public class Commit implements Serializable {
         return thisBlob.getContents();
     }
 
+    private String getStackedFileSha1(String fileName) {
+        return stackedBlob.get(fileName);
+    }
+
+    public boolean isWithStackedSame(File file) {
+        byte[] contents = Utils.readContents(file);
+        String sha1ByAddFile = Utils.sha1(contents);
+        String sha1ByFile = getStackedFileSha1(file.getName());
+        if (sha1ByFile.equals(sha1ByAddFile)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Set<String> getUnstackedFile() {
         return unstackedFile;
     }
@@ -170,6 +185,7 @@ public class Commit implements Serializable {
 
     private String messages;
     private long timestemp;
+    // 文件名/has
     private TreeMap<String, String> stackedBlob;
     private Set<String> unstackedFile;
     private String last;
