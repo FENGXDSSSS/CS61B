@@ -90,13 +90,23 @@ public class Repository {
             // 从Rm缓存区中删除对应文件
             bufferRm.rmFile(addFile.getName());
             bufferRm.save();
-        } else {
-            // 写入缓冲区
-            byte[] contents = Utils.readContents(addFile);
-            bufferAdd.add(addFile.getName(), contents);
-            // 再次序列化缓冲区
-            bufferAdd.save();
+            return;
         }
+        // 检查文件是否一致
+        Branch curBranch = Branch.readFromFile();
+        // 获取当前head ————操作好麻烦……
+        String head = curBranch.getHEAD();
+        // 读入当前commit
+        Commit curCommit = Commit.readFromFile(head);
+        // 检查是否包含当前文件，且内容一致 ———— 无操作
+        if (curCommit.containStacked(fileName) && curCommit.isWithStackedSame(addFile)) {
+            return;
+        }
+        // 写入缓冲区
+        byte[] contents = Utils.readContents(addFile);
+        bufferAdd.add(addFile.getName(), contents);
+        // 再次序列化缓冲区
+        bufferAdd.save();
     }
 
     // commit辅助方法
@@ -245,7 +255,7 @@ public class Repository {
             for (String dir : commitList) {
                 Commit commitPrintID = Commit.readFromFile(dir);
                 if (commitPrintID.isEqualsMessage(message)) {
-                    System.out.print(commitPrintID.getSha1());
+                    System.out.println(commitPrintID.getSha1());
                 }
             }
         }
