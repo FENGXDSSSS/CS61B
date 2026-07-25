@@ -1,13 +1,13 @@
 package gitlet;
 
-// TODO: any imports you need here
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.File;
 import java.io.Serializable;
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
+ *
  *  does at a high level.
  *
  *  @author TODO
@@ -23,7 +23,7 @@ public class Commit implements Serializable {
     public Commit(String message, String author,
                   long time, String last, Map<String, String> stackedBlob1) {
         // 消息
-        this.message = message;
+        this.messages= message;
         // 时间戳
         this.timestemp = time;
 
@@ -121,7 +121,7 @@ public class Commit implements Serializable {
 
     // 消息message是否与指定消息相同
     public boolean isEqualsMessage(String findMessage) {
-        return findMessage.equals(this.message);
+        return findMessage.equals(this.messages);
     }
 
     // 文件是否被跟踪
@@ -160,11 +160,11 @@ public class Commit implements Serializable {
         String message = "===\n";
         message += "commit " + this.getSha1() + "\n";
         message += "Date: " + this.getDate() + "\n";
-        message += this.message + "\n";
+        message += this.messages + "\n";
         return message;
     }
 
-    private String message;
+    private String messages;
     private long timestemp;
     private TreeMap<String, String> stackedBlob;
     private Set<String> unstackedFile;

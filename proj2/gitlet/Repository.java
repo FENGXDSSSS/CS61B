@@ -42,8 +42,8 @@ public class Repository {
     public static void init() {
         // 创建目录
         if (!GITLET_DIR.mkdir()) {
-            System.out.println("A Gitlet version-control " +
-                    "system already exists in the current directory.");
+            System.out.println
+                    ("A Gitlet version-control system already exists in the current directory.");
             return;
         }
         if (OBJECT_DIR.mkdir()) {
@@ -98,7 +98,7 @@ public class Repository {
     }
 
     private static Map<String, String> updateStacked
-            (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
+    (Commit current, BufferAdd bufferAdd, BufferRm bufferRm) {
         // stacked (Map<File, String> Map-> fileName, BlobHash)
         // buffer (Map<File, byte[]>) create-> Blob
         Map<String, String> updatedStacked = current.getStackedBlob();
@@ -181,9 +181,9 @@ public class Repository {
         // 情况2
         // 分支文件载入, 分支文件只做查看操作无需更新状态
         Branch branch = Branch.readFromFile();
-        String Head = branch.getHEAD();
+        String head = branch.getHEAD();
         // 当前分支当前指向的commit载入
-        Commit currentCommit = Commit.readFromFile(Head);
+        Commit currentCommit = Commit.readFromFile(head);
         if (currentCommit.containStacked(fileNameString)) {
             fileName.delete();
             bufferRm.add(fileNameString);
@@ -336,8 +336,8 @@ public class Repository {
             curCommit.update();
             for (String fileName : curCommit.getUnstackedFile()) {
                 if (targetCommit.fileIsStacked(fileName)) {
-                    System.out.println("There is an untracked file in the way;" +
-                            " delete it, or add and commit it first.");
+                    System.out.println
+                            ("There is an untracked file in the way; delete it, or add and commit it first.");
                     return;
                 }
             }

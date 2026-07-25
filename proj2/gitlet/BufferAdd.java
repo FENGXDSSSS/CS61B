@@ -45,7 +45,7 @@ public class BufferAdd implements Buffer, Iterable<String> {
 
     @Override
     public void showContain() {
-            System.out.print(this.toString());
+        System.out.print(this.toString());
     }
 
     @Override
