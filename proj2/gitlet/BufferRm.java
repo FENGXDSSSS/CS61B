@@ -37,23 +37,19 @@ public class BufferRm implements Buffer, Iterable<String>{
 
     @Override
     public void showContain() {
-        if (this.isEmpty()) {
-            return;
-        } else {
             System.out.print(this.toString());
-        }
     }
 
     @Override
     public String toString() {
-        StringBuilder message = new StringBuilder("=== Staged Files ===\n");
+        StringBuilder message = new StringBuilder("=== Removed Files ===\n");
         List<String> keySet = new ArrayList<>(buffer);
         // 字母排序
         Collections.sort(keySet);
         for (String fileName : keySet) {
             message.append(fileName).append("\n");
         }
-
+        message.append("\n");
         return message.toString();
     }
 

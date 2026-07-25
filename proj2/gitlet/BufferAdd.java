@@ -45,11 +45,7 @@ public class BufferAdd implements Buffer, Iterable<String> {
 
     @Override
     public void showContain() {
-        if (this.isEmpty()) {
-            return;
-        } else {
             System.out.print(this.toString());
-        }
     }
 
     @Override
@@ -61,7 +57,7 @@ public class BufferAdd implements Buffer, Iterable<String> {
         for (String fileName : keySet) {
             message.append(fileName).append("\n");
         }
-
+        message.append("\n");
         return message.toString();
     }
 

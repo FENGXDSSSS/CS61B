@@ -83,7 +83,7 @@ public class Branch implements Serializable {
             else
                 branchMessage.append(name).append("\n");
         }
-
+        branchMessage.append("\n");
         return branchMessage.toString();
     }
 
