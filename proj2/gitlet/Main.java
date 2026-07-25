@@ -41,8 +41,10 @@ public class Main {
                     Repository.checkoutFile(args[2]);
                 } else if (args.length == 4 && args[2].equals("--")) {
                     Repository.checkoutCommitFile(args[1], args[3]);
-                } else {
+                } else if (args.length == 2){
                     Repository.checkoutBranch(args[1]);
+                } else {
+                    System.out.println("Incorrect operands.");
                 }
                 break;
             case "branch":
