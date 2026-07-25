@@ -148,11 +148,7 @@ public class Commit implements Serializable {
         byte[] contents = Utils.readContents(file);
         String sha1ByAddFile = Utils.sha1(contents);
         String sha1ByFile = getStackedFileSha1(file.getName());
-        if (sha1ByFile.equals(sha1ByAddFile)) {
-            return true;
-        } else {
-            return false;
-        }
+        return sha1ByFile.equals(sha1ByAddFile);
     }
 
     public Set<String> getUnstackedFile() {
@@ -191,5 +187,4 @@ public class Commit implements Serializable {
     private String last;
     private String author;
     private String sha1;
-
 }
