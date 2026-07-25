@@ -163,7 +163,7 @@ public class Repository {
 
     public static void remove(String filename) {
         File fileName = Utils.join(CWD, filename);
-        String fileNameString = fileName.getPath();
+
         /*  1.先查缓存区(add)，有的话从缓存区(add)中删除
             2.再查当前分支当前提交的追踪列表，有的话先存入缓存区(rm)，如果此文件在工作目录中，删除工作目录中的目标文件;
               在此方法中不急着更新追踪列表，因为更新追踪列表的状态统一集中到commit方法
@@ -174,8 +174,8 @@ public class Repository {
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
         int flag = 0;
-        if (bufferAdd.contain(fileNameString)) {
-            bufferAdd.remove(fileNameString);
+        if (bufferAdd.contain(fileName.getName())) {
+            bufferAdd.remove(fileName.getName());
             flag += 1;
         }
         // 情况2
@@ -184,9 +184,9 @@ public class Repository {
         String head = branch.getHEAD();
         // 当前分支当前指向的commit载入
         Commit currentCommit = Commit.readFromFile(head);
-        if (currentCommit.containStacked(fileNameString)) {
+        if (currentCommit.containStacked(fileName.getName())) {
             fileName.delete();
-            bufferRm.add(fileNameString);
+            bufferRm.add(fileName.getName());
             flag += 1;
         }
         if (flag == 0) {
@@ -210,11 +210,12 @@ public class Repository {
     }
 
     public static void log() {
+
         // 当前分支载入
         Branch branch = Branch.readFromFile();
-        String Head = branch.getHEAD();
+        String head = branch.getHEAD();
 
-        logHelper(Head);
+        logHelper(head);
     }
     // 全局log
     public static void globalLog() {
