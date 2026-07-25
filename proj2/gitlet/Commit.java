@@ -100,7 +100,11 @@ public class Commit implements Serializable {
 
     // 是否包含指定文件key
     public boolean containStacked(String fileKey) {
-        return stackedBlob.containsKey(fileKey);
+        if (stackedBlob == null) {
+            return false;
+        } else {
+            return stackedBlob.containsKey(fileKey);
+        }
     }
 
     // 读文件
