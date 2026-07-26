@@ -405,7 +405,7 @@ public class Repository {
     public static void rmBranch(String branchName) {
         // 取出branch入内存
         Branch branch = Branch.readFromFile();
-        if (branch.curBranchIsContained(branchName)) {
+        if (!branch.curBranchIsContained(branchName)) {
             System.out.println("A branch with that name does not exist.");
             return;
         } else if (branch.isCurrentBranch(branchName)) {
