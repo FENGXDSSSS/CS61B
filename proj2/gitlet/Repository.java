@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -357,7 +358,7 @@ public class Repository {
     public static void checkoutBranch(String branchName) {
         // 载入所有工作目录下的文件非文件夹
         File fileDir = Utils.join(CWD);
-        File[] fileList = fileDir.listFiles();
+
         // 依旧
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         Branch branch = Branch.readFromFile();
@@ -372,15 +373,22 @@ public class Repository {
             Commit curCommit = Commit.readFromFile(commitSha1);
             String targetHead = branch.getTargetHead(branchName);
             Commit targetCommit = Commit.readFromFile(targetHead);
-            // 更新状态
-            update(curCommit, targetCommit);
-            for (String fileName : curCommit.getUnstackedFile()) {
-                if (!targetCommit.fileIsStacked(fileName)) {
+
+            List<String> files = Utils.plainFilenamesIn(fileDir);
+            String fileName;
+            for (String fileStr : files) {
+                boolean isStacked = curCommit.containStacked(fileStr);
+                boolean isBuffer = bufferAdd.contain(fileStr);
+                if (!isStacked && !isBuffer) {
                     System.out.println("There is an untracked file in the way; "
                             + "delete it, or add and commit it first.");
                     return;
                 }
             }
+
+            // 更新状态
+            update(curCommit, targetCommit);
+
             // 切换分支
             branch.goToBranch(branchName);
 
