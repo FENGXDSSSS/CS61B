@@ -386,7 +386,7 @@ public class Repository {
             for (String fileStr : files) {
                 boolean isStacked = curCommit.containStacked(fileStr);
                 boolean isBuffer = bufferAdd.contain(fileStr);
-                if (!isStacked && !isBuffer) {
+                if (!isStacked && !isBuffer && targetCommit.containStacked(fileStr)) {
                     System.out.println("There is an untracked file in the way; "
                             + "delete it, or add and commit it first.");
                     return;
