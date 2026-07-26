@@ -5,10 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
 import static gitlet.Utils.*;
-
-
 
 /** Represents a gitlet repository.
  *
@@ -38,7 +35,8 @@ public class Repository {
     public static final File BUFFER_DIR = join(GITLET_DIR, "buffer");
     // 分支目录
     public static final File BRANCH_DIR = join(GITLET_DIR, "branch");
-
+    // 未追踪文件目录
+    public static final File UNSTACKED_DIR = join(GITLET_DIR, "unstacked");
     public static void init() {
         // 创建目录
         if (!GITLET_DIR.mkdir()) {
@@ -49,9 +47,11 @@ public class Repository {
         if (OBJECT_DIR.mkdir()) {
             COMMIT_DIR.mkdir();
             BLOB_DIR.mkdir();
+
         }
         BUFFER_DIR.mkdir();
         BRANCH_DIR.mkdir();
+        UNSTACKED_DIR.mkdir();
         // 初始化用户名，待完善
             // 用户名定义移出方法
             // 下次调用gitlet，用户名不会保存，值为null
@@ -68,11 +68,15 @@ public class Repository {
         // 初始化缓存区
         BufferAdd bufferadd = new BufferAdd();
         BufferRm bufferrm = new BufferRm();
+        // 初始化未追踪文件
+        UnStacked unStackedFiles = new UnStacked();
         // 存盘
         branch.save();
         bufferadd.save();
         bufferrm.save();
+        unStackedFiles.save();
     }
+
 
     public static void add(String fileName) {
         // 写入要添加的文件地址
@@ -85,6 +89,8 @@ public class Repository {
         // 反序列化缓冲区(Add)/(Rm)
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
+        // 反序列化未追踪文件
+        UnStacked unStackedFiles = UnStacked.readFromFile();
         // 检查此次添加是否为恢复操作
         if (bufferRm.contain(addFile.getName())) {
             // 从Rm缓存区中删除对应文件
@@ -105,6 +111,7 @@ public class Repository {
         // 写入缓冲区
         byte[] contents = Utils.readContents(addFile);
         bufferAdd.add(addFile.getName(), contents);
+        unStackedFiles.rmUnStackedOfBufferAdd(bufferAdd);
         // 再次序列化缓冲区
         bufferAdd.save();
     }
@@ -272,15 +279,16 @@ public class Repository {
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
         Branch branch = Branch.readFromFile();
+
         // 打印状态
         branch.showCurrentBranch();
         bufferAdd.showContain();
         bufferRm.showContain();
         // 保留标题
         String modify = "=== Modifications Not Staged For Commit ===\n\n";
-        String untracked = "=== Untracked Files ===\n\n";
-        System.out.println(modify + untracked);
-
+        String unStacked = "=== Untracked Files ===\n\n";
+        System.out.println(modify + unStacked);
+        // 打印未追踪状态=
     }
 
     public static void checkoutFile(String fileName) {
@@ -429,6 +437,7 @@ public class Repository {
         Branch branch = Branch.readFromFile();
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
+        /*UnStacked unStackedFiles = UnStacked.readFromFile();*/
 
         Commit curCommit = getThatCommit(branch.getHEAD());
         Commit targetCommit = getThatCommit(commitID);
@@ -437,6 +446,8 @@ public class Repository {
         }
         update(curCommit, targetCommit);
         targetCommit.writeFilesFromStacked();
+        /*// 从暂存区中获取文件到为追踪文件集合
+        unStackedFiles.getFileFromBuffer(bufferAdd);*/
         branch.updateCurBranch(targetCommit.getSha1());
         bufferAdd.clear();
         bufferAdd.save();

@@ -62,6 +62,11 @@ public class BufferAdd implements Buffer, Iterable<String> {
     }
 
     @Override
+    public Set<String> getSet() {
+        return buffer.keySet();
+    }
+
+    @Override
     public Iterator<String> iterator() {
         return buffer.keySet().iterator();
     }

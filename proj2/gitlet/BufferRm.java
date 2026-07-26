@@ -57,6 +57,11 @@ public class BufferRm implements Buffer, Iterable<String> {
         return message.toString();
     }
 
+    @Override
+    public Set<String> getSet() {
+        return buffer;
+    }
+
     public static BufferRm readFromFile() {
         File bufferRmFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
         return Utils.readObject(bufferRmFile, BufferRm.class);

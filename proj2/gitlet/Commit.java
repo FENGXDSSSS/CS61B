@@ -30,8 +30,6 @@ public class Commit implements Serializable {
         // last提交
         this.last = last;
 
-        unstackedFile = new TreeSet<>();
-
         // Blob追踪映射
 
         if (stackedBlob1 != null) {
@@ -65,35 +63,6 @@ public class Commit implements Serializable {
             return stackedBlob;
         }
     }
-
-    // 设置未追踪名单
-    public void setUnstackedFile(String unstacked) {
-        unstackedFile.add(unstacked);
-    }
-
-    // 更新当前工作目录文件状态
-    /*public void update() {
-        // 获取文件列表
-        File fileDir = Repository.CWD;
-        File[] fileList = fileDir.listFiles();
-
-        if (fileList != null) {
-            for (File file : fileList) {
-                String fileName = file.getName();
-                // 如果不在追踪列表
-                if (!containStacked(fileName)) {
-                    unstackedFile.add(fileName);
-                    continue;
-                }
-                // 获取文件内容
-                byte[] fileContents = Utils.readContents(file);
-                // 如果内容不一致
-                if (!Arrays.equals(getStackedFileContents(fileName), fileContents)) {
-                    unstackedFile.add(fileName);
-                }
-            }
-        }
-    }*/
 
     public void save() {
         File commitFile = Utils.join(Repository.COMMIT_DIR, getSha1());
@@ -153,16 +122,6 @@ public class Commit implements Serializable {
         return sha1ByFile.equals(sha1ByAddFile);
     }
 
-    public Set<String> getUnstackedFile() {
-        return unstackedFile;
-    }
-
-    // 是否未跟踪
-    public boolean isUnstacked() {
-        // 是空返回true
-        return unstackedFile.isEmpty();
-    }
-
     // 追踪列表写入文件
     public void writeFilesFromStacked() {
         for (String fileName : stackedBlob.keySet()) {
@@ -185,7 +144,6 @@ public class Commit implements Serializable {
     private long timestemp;
     // 文件名/has
     private TreeMap<String, String> stackedBlob;
-    private Set<String> unstackedFile;
     private String last;
     private String author;
     private String sha1;
