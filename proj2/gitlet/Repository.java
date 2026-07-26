@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -429,12 +428,14 @@ public class Repository {
     public static void reset(String commitID) {
         Branch branch = Branch.readFromFile();
         BufferAdd bufferAdd = BufferAdd.readFromFile();
+        BufferRm bufferRm = BufferRm.readFromFile();
 
+        Commit curCommit = getThatCommit(branch.getHEAD());
         Commit targetCommit = getThatCommit(commitID);
         if (targetCommit == null) {
             System.out.println("No commit with that id exists."); return;
         }
-        rmDir();
+        update(curCommit, targetCommit);
         targetCommit.writeFilesFromStacked();
         branch.updateCurBranch(targetCommit.getSha1());
         bufferAdd.clear();
@@ -444,12 +445,5 @@ public class Repository {
     public static void merge(String branchName) {
 
     }
-    // 清空工作目录
-    private static void rmDir() {
-        for (File file : CWD.listFiles()) {
-            if (!file.isDirectory()) {
-                file.delete();
-            }
-        }
-    }
+
 }
