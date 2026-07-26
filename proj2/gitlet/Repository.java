@@ -446,11 +446,13 @@ public class Repository {
         }
         update(curCommit, targetCommit);
         targetCommit.writeFilesFromStacked();
+        branch.setHEAD(commitID);
         /*// 从暂存区中获取文件到为追踪文件集合
         unStackedFiles.getFileFromBuffer(bufferAdd);*/
         branch.updateCurBranch(targetCommit.getSha1());
         bufferAdd.clear();
         bufferAdd.save();
+        branch.save();
     }
 
     public static void merge(String branchName) {
