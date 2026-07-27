@@ -109,6 +109,9 @@ public class Branch implements Serializable {
     // 读取文件
     public static Branch readFromFile() {
         File branchFile = Utils.join(Repository.BRANCH_DIR, "branch");
+        if (!branchFile.exists()) {
+            return null;
+        }
         return Utils.readObject(branchFile, Branch.class);
     }
 

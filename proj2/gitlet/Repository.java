@@ -279,6 +279,10 @@ public class Repository {
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
         Branch branch = Branch.readFromFile();
+        if (bufferAdd == null || bufferRm == null || branch == null) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            return;
+        }
 
         // 打印状态
         branch.showCurrentBranch();

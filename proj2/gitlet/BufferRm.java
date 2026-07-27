@@ -64,6 +64,9 @@ public class BufferRm implements Buffer, Iterable<String> {
 
     public static BufferRm readFromFile() {
         File bufferRmFile = Utils.join(Repository.BUFFER_DIR, "bufferRm");
+        if (!bufferRmFile.exists()) {
+            return null;
+        }
         return Utils.readObject(bufferRmFile, BufferRm.class);
     }
 

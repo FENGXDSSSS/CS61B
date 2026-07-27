@@ -73,6 +73,9 @@ public class BufferAdd implements Buffer, Iterable<String> {
 
     public static BufferAdd readFromFile()   {
         File bufferAddFile = Utils.join(Repository.BUFFER_DIR, "bufferAdd");
+        if (!bufferAddFile.exists()) {
+            return null;
+        }
         return Utils.readObject(bufferAddFile, BufferAdd.class);
     }
 
