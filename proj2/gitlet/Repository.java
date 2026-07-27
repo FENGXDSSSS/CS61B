@@ -444,6 +444,19 @@ public class Repository {
         if (targetCommit == null) {
             System.out.println("No commit with that id exists."); return;
         }
+
+        List<String> files = Utils.plainFilenamesIn(CWD);
+        String fileName;
+        for (String fileStr : files) {
+            boolean isStacked = curCommit.containStacked(fileStr);
+            boolean isBuffer = bufferAdd.contain(fileStr);
+            if (!isStacked && !isBuffer && targetCommit.containStacked(fileStr)) {
+                System.out.println("There is an untracked file in the way; "
+                        + "delete it, or add and commit it first.");
+                return;
+            }
+        }
+
         update(curCommit, targetCommit);
         targetCommit.writeFilesFromStacked();
         branch.setHEAD(commitID);
