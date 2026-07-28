@@ -88,6 +88,7 @@ public class Branch implements Serializable {
         return branchMessage.toString();
     }
 
+    // 获取目标分支的最新提交ID
     public String getTargetHead(String branchName) {
         return branchMap.get(branchName);
     }
@@ -119,6 +120,6 @@ public class Branch implements Serializable {
     private Map<String, String> branchMap;
     // 当前分支（分支名称）
     private String currentBranch;
-    // 当前分支的当前Commit（commit hash）
+    // 当前分支的最新Commit（commit hash）
     private String HEAD;
 }

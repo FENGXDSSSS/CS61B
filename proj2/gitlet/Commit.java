@@ -21,16 +21,16 @@ public class Commit implements Serializable {
     // 由于提交一旦建立就无后续更改，所以构造之初就可序列化
     // stackedBlob1 在init命令中为null
     public Commit(String message, String author,
-                  long time, String last, Map<String, String> stackedBlob1) {
+                  long time, String firstLast, String secondLast, int lastDepth, Map<String, String> stackedBlob1) {
         // 消息
         this.messages = message;
         // 时间戳
         this.timestemp = time;
-
         // last提交
-        this.last = last;
-
-        // Blob追踪映射
+        this.firstLast = firstLast;
+        this.secondLast = secondLast;
+        // 记录深度
+        this.depth = lastDepth + 1;
 
         if (stackedBlob1 != null) {
             this.stackedBlob = new TreeMap<>();
@@ -40,7 +40,7 @@ public class Commit implements Serializable {
         this.author = author;
         // hash计算
         byte[] stackStr = Utils.serialize(stackedBlob);
-        this.sha1 = Utils.sha1(message, author, String.valueOf(timestemp), last, stackStr);
+        this.sha1 = Utils.sha1(message, author, String.valueOf(timestemp), firstLast, secondLast, stackStr);
 
     }
     /** The message of this Commit. */
@@ -52,7 +52,12 @@ public class Commit implements Serializable {
 
     // 获取上一次提交
     public String getLast() {
-        return last;
+        return firstLast;
+    }
+
+    // 获取次提交
+    public String getSecondLast() {
+        return secondLast;
     }
 
     // 获取追踪目录
@@ -76,6 +81,11 @@ public class Commit implements Serializable {
         } else {
             return stackedBlob.containsKey(fileKey);
         }
+    }
+
+    // 获取改提交的深度
+    public int getDepth() {
+        return depth;
     }
 
     // 读文件
@@ -140,11 +150,25 @@ public class Commit implements Serializable {
         return message;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+        Commit commit = (Commit) o;
+        return this.getSha1().equals(commit.getSha1());
+    }
+
+    private int depth;
     private String messages;
     private long timestemp;
     // 文件名/has
     private TreeMap<String, String> stackedBlob;
-    private String last;
+    private String firstLast;
+    private String secondLast;
     private String author;
     private String sha1;
 }

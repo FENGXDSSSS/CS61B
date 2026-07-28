@@ -1,9 +1,7 @@
 package gitlet;
 
 import java.io.File;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -58,7 +56,7 @@ public class Repository {
         // 初始化各部件
         // 初始提交
         // 获取当前时间戳new Date().getTime();
-        Commit initCommit = new Commit("initial commit", userName, 0, " ", null);
+        Commit initCommit = new Commit("initial commit", userName, 0, " ", " ", 0, null);
         initCommit.save();
         // 初始化分支，将当前提交纳入初始化分支，初始分支为master
         // 分支类具有HEAD属性，存放initCommit hash， 此时 HEAD = initCommit.getSha1
@@ -80,7 +78,7 @@ public class Repository {
 
     public static void add(String fileName) {
         // 写入要添加的文件地址
-        File addFile = Utils.join(CWD, fileName);
+        File addFile = join(CWD, fileName);
 
         if (!addFile.exists()) {
             System.out.println("File does not exist.");
@@ -109,7 +107,7 @@ public class Repository {
             return;
         }
         // 写入缓冲区
-        byte[] contents = Utils.readContents(addFile);
+        byte[] contents = readContents(addFile);
         bufferAdd.add(addFile.getName(), contents);
         unStackedFiles.rmUnStackedOfBufferAdd(bufferAdd);
         // 再次序列化缓冲区
@@ -171,7 +169,8 @@ public class Repository {
         // 更新追踪列表
         Map<String, String> stacked = updateStacked(currentCommit, bufferAdd, bufferRm);
         // 新建commit实例
-        Commit newCommit = new Commit(message, userName, new Date().getTime(), head, stacked);
+        int lastDepth = currentCommit.getDepth();
+        Commit newCommit = new Commit(message, userName, new Date().getTime(), head, " ", lastDepth, stacked);
         head = newCommit.getSha1();
         // 重新设置到当前分支当前指针上
         branch.setHEAD(head);
@@ -187,7 +186,7 @@ public class Repository {
     }
 
     public static void remove(String filename) {
-        File fileName = Utils.join(CWD, filename);
+        File fileName = join(CWD, filename);
 
         /*  1.先查缓存区(add)，有的话从缓存区(add)中删除
             2.再查当前分支当前提交的追踪列表，有的话先存入缓存区(rm)，如果此文件在工作目录中，删除工作目录中的目标文件;
@@ -245,7 +244,7 @@ public class Repository {
     // 全局log
     public static void globalLog() {
         List<String> commitList;
-        commitList = Utils.plainFilenamesIn(COMMIT_DIR);
+        commitList = plainFilenamesIn(COMMIT_DIR);
         if (commitList != null) {
             for (String dir : commitList) {
                 // 载入
@@ -259,7 +258,7 @@ public class Repository {
         // 记录次数
         int next = 0;
         List<String> commitList;
-        commitList = Utils.plainFilenamesIn(COMMIT_DIR);
+        commitList = plainFilenamesIn(COMMIT_DIR);
         if (commitList != null) {
             for (String dir : commitList) {
                 Commit commitPrintID = Commit.readFromFile(dir);
@@ -298,7 +297,7 @@ public class Repository {
     public static void checkoutFile(String fileName) {
         // 载入到内存
         BufferAdd bufferAdd = BufferAdd.readFromFile();
-        File fileDir = Utils.join(CWD, fileName);
+        File fileDir = join(CWD, fileName);
         Branch branch = Branch.readFromFile();
         String head = branch.getHEAD();
         Commit curCommit = Commit.readFromFile(head);
@@ -308,7 +307,7 @@ public class Repository {
         } */
         if (curCommit != null && curCommit.fileIsStacked(fileName)) {
             byte[] contents = curCommit.getStackedFileContents(fileName);
-            Utils.writeContents(fileDir, (Object) contents);
+            writeContents(fileDir, (Object) contents);
         }  else {
             System.out.println("File does not exist in that commit.");
         }
@@ -335,7 +334,7 @@ public class Repository {
 
     public static void checkoutCommitFile(String commitID, String fileName) {
         // 依旧先载入这一块
-        File fileDir = Utils.join(CWD, fileName);
+        File fileDir = join(CWD, fileName);
         Branch branch = Branch.readFromFile();
         Commit thatCommit = getThatCommit(commitID);
         if (thatCommit == null) {
@@ -344,7 +343,7 @@ public class Repository {
         } else {
             if (thatCommit.fileIsStacked(fileName)) {
                 byte[] contents = thatCommit.getStackedFileContents(fileName);
-                Utils.writeContents(fileDir, (Object) contents);
+                writeContents(fileDir, (Object) contents);
             } else {
                 System.out.println("File does not exist in that commit.");
             }
@@ -355,20 +354,20 @@ public class Repository {
         File file;
         for (String curf : cur.getStackedBlob().keySet()) {
             if (!tar.containStacked(curf)) {
-                file = Utils.join(CWD, curf);
+                file = join(CWD, curf);
                 file.delete();
             }
         }
 
         for (String tarf : tar.getStackedBlob().keySet()) {
-            file = Utils.join(CWD, tarf);
-            Utils.writeContents(file, tar.getStackedFileContents(tarf));
+            file = join(CWD, tarf);
+            writeContents(file, tar.getStackedFileContents(tarf));
         }
     }
 
     public static void checkoutBranch(String branchName) {
         // 载入所有工作目录下的文件非文件夹
-        File fileDir = Utils.join(CWD);
+        File fileDir = join(CWD);
 
         // 依旧
         BufferAdd bufferAdd = BufferAdd.readFromFile();
@@ -385,7 +384,7 @@ public class Repository {
             String targetHead = branch.getTargetHead(branchName);
             Commit targetCommit = Commit.readFromFile(targetHead);
 
-            List<String> files = Utils.plainFilenamesIn(fileDir);
+            List<String> files = plainFilenamesIn(fileDir);
             String fileName;
             for (String fileStr : files) {
                 boolean isStacked = curCommit.containStacked(fileStr);
@@ -449,7 +448,7 @@ public class Repository {
             System.out.println("No commit with that id exists."); return;
         }
 
-        List<String> files = Utils.plainFilenamesIn(CWD);
+        List<String> files = plainFilenamesIn(CWD);
         String fileName;
         for (String fileStr : files) {
             boolean isStacked = curCommit.containStacked(fileStr);
@@ -472,8 +471,115 @@ public class Repository {
         branch.save();
     }
 
-    public static void merge(String branchName) {
+    // 最近共同祖先的辅助方法，首次遍历当前分支的所有边
+    private static HashSet<String> curBranchAllPoint(String curCommitID) {
+        // 定义优先队列
+        PriorityQueue<Commit> queue = new PriorityQueue<Commit>(new Comparator<Commit>() {
+            @Override
+            // 取最大堆
+            public int compare(Commit o1, Commit o2) {
+                return -(o1.getDepth() - o2.getDepth());
+            }
+        });
 
+        // 定义并查集
+        HashSet<String> set = new HashSet<>();
+
+        // 取出对应commit
+        Commit curCommit = Commit.readFromFile(curCommitID);
+        Commit outCommit = null;
+        Commit firstCommit = null;
+        Commit secondCommit = null;
+        queue.add(curCommit);
+        while (!queue.isEmpty()) {
+            outCommit = queue.poll();
+            // 弹出元素并计入并查集
+            set.add(outCommit.getSha1());
+            if (!outCommit.getLast().equals(" ")) {
+                firstCommit = Commit.readFromFile(outCommit.getLast());
+            }
+            // 如果当前提交包含上次的次提交
+            if (!outCommit.getSecondLast().equals(" ")) {
+                secondCommit = Commit.readFromFile(outCommit.getSecondLast());
+            }
+            // 过滤相同提交，优化时间
+            if (firstCommit != null && set.contains(firstCommit.getSha1())) {
+                continue;
+            }
+            if (firstCommit != null) {
+                queue.add(firstCommit);
+            }
+            // 如果次提交不为null记录
+            if (secondCommit != null) {
+                queue.add(secondCommit);
+            }
+            secondCommit = null;
+        }
+        return set;
+    }
+
+    // 获取分裂点
+    private static String getSplitBranch(String curBranchCommit, String tarBranchCommit) {
+        // 定义优先队列
+        PriorityQueue<Commit> queue = new PriorityQueue<Commit>(new Comparator<Commit>() {
+            @Override
+            public int compare(Commit o1, Commit o2) {
+                return -(o1.getDepth() - o2.getDepth());
+            }
+        });
+       String splitCommitID = "";
+        HashSet<String> commitSet = curBranchAllPoint(curBranchCommit);
+
+        Commit tarCommit = Commit.readFromFile(tarBranchCommit);
+        Commit outCommit = null;
+        Commit firstCommit = null;
+        Commit secondCommit = null;
+        queue.add(tarCommit);
+        while (!queue.isEmpty()) {
+            outCommit = queue.poll();
+            // 弹出元素计入并查集
+            if (commitSet.contains(outCommit.getSha1())) {
+                splitCommitID = outCommit.getSha1();
+                break;
+            }
+            if (!outCommit.getLast().equals(" ")) {
+                firstCommit = Commit.readFromFile(outCommit.getLast());
+            }
+            // 如果当前提交的包含上次的此提交
+            if (!outCommit.getSecondLast().equals(" ")) {
+                secondCommit = Commit.readFromFile(outCommit.getSecondLast());
+            }
+            /*// 过滤相同提交，优化时间
+            if (queue.contains(firstCommit)) {
+                continue;
+            }*/
+            queue.add(firstCommit);
+            // 如果次提交不为null记录
+            if (secondCommit != null) {
+                queue.add(secondCommit);
+            }
+            secondCommit = null;
+        }
+        return splitCommitID;
+
+    }
+
+    public static void merge(String tarBranch) {
+        // 反序列化
+        Branch branch = Branch.readFromFile();
+        BufferAdd bufferAdd = BufferAdd.readFromFile();
+        BufferRm bufferRm = BufferRm.readFromFile();
+        // 获取两个分支的最新提交
+        String curBranchCommitID = branch.getHEAD();
+        String tarBranchCommitID = branch.getTargetHead(tarBranch);
+        // 获取两分支的共同祖先
+        String splitCommitID = getSplitBranch(curBranchCommitID, tarBranchCommitID);
+        // 如果split为给定分支，不进行操作
+        if (tarBranchCommitID.equals(splitCommitID)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            return;
+        }
+        // 
     }
 
 }
