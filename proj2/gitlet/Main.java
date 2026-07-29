@@ -23,7 +23,8 @@ public class Main {
                 Repository.add(args[1]);
                 break;
             case "commit":
-                Repository.commit(args[1]);
+                // 用户自己提交时不需考虑上一次的主次提交，只有一个父提交
+                Repository.commit(args[1], null, null);
                 break;
             case "rm":
                 Repository.remove(args[1]);

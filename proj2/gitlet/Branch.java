@@ -93,6 +93,11 @@ public class Branch implements Serializable {
         return branchMap.get(branchName);
     }
 
+    // 获取当前分支
+    public String getCurrentBranch() {
+        return currentBranch;
+    }
+
     // 切换分支, 无需处理不存在分支, 交给
     public void goToBranch(String branchName) {
         // 更改当前分支名

@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static gitlet.Utils.*;
@@ -143,7 +144,7 @@ public class Repository {
         return updatedStacked;
     }
 
-    public static void commit(String message) {
+    public static void commit(String message, String firstLast, String secondLast) {
         // 缓存区文件载入
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
@@ -352,6 +353,7 @@ public class Repository {
 
     private static void update(Commit cur, Commit tar) {
         File file;
+        // 删除当前分支的文件
         for (String curf : cur.getStackedBlob().keySet()) {
             if (!tar.containStacked(curf)) {
                 file = join(CWD, curf);
@@ -359,6 +361,7 @@ public class Repository {
             }
         }
 
+        // 创建目标分支的文件
         for (String tarf : tar.getStackedBlob().keySet()) {
             file = join(CWD, tarf);
             writeContents(file, tar.getStackedFileContents(tarf));
@@ -564,22 +567,184 @@ public class Repository {
 
     }
 
+    // 辅助获取全部文件集合
+    private static HashSet<String> getAllFilesSet(Commit split, Commit cur, Commit tar) {
+        HashSet<String> resultSet = new HashSet<String>();
+        if (split.getStackedBlob() != null) {
+            resultSet.addAll(split.getStackedBlob().keySet());
+        }
+        if (cur.getStackedBlob() != null) {
+            resultSet.addAll(cur.getStackedBlob().keySet());
+        }
+        if (tar.getStackedBlob() != null) {
+            resultSet.addAll(tar.getStackedBlob().keySet());
+        }
+        return resultSet;
+    }
+
+    // 辅助获取三个文件映射
+    private static HashMap<String, String> getFilesMapFromOne(Commit oneCommit) {
+        HashMap<String, String> resultMap = new HashMap<String, String>();
+        if (oneCommit.getStackedBlob() != null) {
+            resultMap.putAll(oneCommit.getStackedBlob());
+        }
+        return resultMap;
+    }
+
+    // 辅助检出文件
+    private static void mergeCheckout(String fileName, byte[] contents) {
+        File dir = Utils.join(CWD, fileName);
+        Utils.writeContents(dir, contents);
+        return;
+    }
+
+    // 删除文件
+    private static void deleFile(String fileName) {
+        File dir = Utils.join(CWD, fileName);
+        // 受限制的删除
+        Utils.restrictedDelete(dir);
+        return;
+    }
+
+    // 合并文件
+    private static void mergeFileContents(String fileName, byte[] curCont, byte[] tarCont) {
+        // 文件路径
+        File fileDir = Utils.join(CWD, fileName);
+        String curStr;
+        String tarStr;
+        StringBuilder contentsOfFile = new StringBuilder("<<<<<<< HEAD\n");
+        if (curCont == null) {
+            curStr = "\n";
+            tarStr = new String(tarCont, StandardCharsets.UTF_8);
+        } else if (tarCont == null) {
+            tarStr = "\n";
+            curStr = new String(curCont, StandardCharsets.UTF_8);
+        } else {
+            curStr = new String(curCont, StandardCharsets.UTF_8);
+            tarStr = new String(tarCont, StandardCharsets.UTF_8);
+        }
+        contentsOfFile.append(curStr);
+        contentsOfFile.append("\n" + "=======");
+        contentsOfFile.append(tarStr);
+        contentsOfFile.append("\n" + ">>>>>>>");
+        Utils.writeObject(fileDir, contentsOfFile);
+    }
+
     public static void merge(String tarBranch) {
         // 反序列化
         Branch branch = Branch.readFromFile();
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
+        // 获取当前分支名称
+        String curBranch = branch.getCurrentBranch();
         // 获取两个分支的最新提交
         String curBranchCommitID = branch.getHEAD();
         String tarBranchCommitID = branch.getTargetHead(tarBranch);
         // 获取两分支的共同祖先
         String splitCommitID = getSplitBranch(curBranchCommitID, tarBranchCommitID);
+
         // 如果split为给定分支，不进行操作
         if (tarBranchCommitID.equals(splitCommitID)) {
             System.out.println("Given branch is an ancestor of the current branch.");
             return;
         }
-        // 
-    }
 
+        Commit curCommit = Commit.readFromFile(curBranchCommitID);
+        Commit tarCommit = Commit.readFromFile(tarBranchCommitID);
+        Commit splitCommit = Commit.readFromFile(splitCommitID);
+
+        // 如果split为当前分支，检出给定分支点，不改变当前分支
+        if (curBranchCommitID.equals(splitCommitID)) {
+            // 更新工作区, 参数为Commit
+            update(curCommit , tarCommit);
+            // 当前分支更新该提交
+            branch.updateCurBranchHead(tarBranchCommitID);
+            System.out.println("Current branch fast-forwarded.");
+            branch.save();
+            return;
+        }
+
+        // 获取四个映射
+        // (allFiles, split, current, target)
+        HashSet<String> allFileSet = getAllFilesSet(splitCommit, curCommit, tarCommit);
+        HashMap<String, String> splitFilesMap = getFilesMapFromOne(splitCommit);
+        HashMap<String, String> curFilesMap = getFilesMapFromOne(curCommit);
+        HashMap<String, String> tarFilesMap = getFilesMapFromOne(tarCommit);
+
+        Blob splitB = null;
+        Blob curB = null;
+        Blob tarB = null;
+
+        // 遍历allFiles
+        for (String fileName : allFileSet) {
+            if (splitFilesMap.containsKey(fileName)) {
+                splitB = Blob.readFromFile(splitFilesMap.get(fileName));
+            } else {
+                splitB = null;
+            }
+            if (curFilesMap.containsKey(fileName)) {
+                curB = Blob.readFromFile(curFilesMap.get(fileName));
+            } else {
+                curB = null;
+            }
+            if (tarFilesMap.containsKey(fileName)) {
+                tarB = Blob.readFromFile(tarFilesMap.get(fileName));
+            } else {
+                tarB = null;
+            }
+            // split, cur, tar中均存在该文件
+            if (splitB != null && curB != null && tarB != null) {
+                // 1.cur中文件未修改，tar中文件修改 --> 文件从给定分支中检出并暂存
+                if (splitB.getContents() == curB.getContents() && splitB.getContents() != tarB.getContents()) {
+                    mergeCheckout(fileName, tarB.getContents());
+                    // 暂存暂存文件
+                    bufferAdd.add(fileName, tarB.getContents());
+                }
+                // 2.cur中文件修改，tar中文件未修改 --> 保持原样
+                if (splitB.getContents() != curB.getContents() && splitB.getContents() == tarB.getContents()) {
+                    // 原样不变
+                    continue;
+                }
+                // 3.cur, tar一同修改且内容一致 --> 原样不变
+                if (curB.getContents() == tarB.getContents() && curB.getContents() != splitB.getContents()) {
+                    // 原样不变
+                    continue;
+                }
+            // 4.split, cur不存在该文件，tar存在该文件 --> 检出该文件并暂存
+            } else if (splitB == null && curB == null && tarB != null) {
+                // 检出文件
+                mergeCheckout(fileName, tarB.getContents());
+                // 暂存文件
+                bufferAdd.add(fileName, tarB.getContents());
+            // 5.split, tar不存在该文件，cur存在该文件 --> 原样保持
+            } else if (splitB == null && curB != null && tarB == null) {
+                // 原样保持
+                continue;
+            // 6.split, cur存在该文件，tar不存在该文件，且该文件在cur中未修改 --> 删除，并标记为为跟踪状态
+            } else if (splitB != null && curB != null && tarB == null && curB.getContents() == splitB.getContents()) {
+                // 删除该文件
+                deleFile(fileName);
+                // 无需手动设置未为追踪状态
+            // 7.split, tar存在该文件，cur不存在该文件，且该文件在cur中未修改 --> 保持原样
+            } else if (splitB != null && curB == null && tarB != null && tarB.getContents() == splitB.getContents()) {
+                continue;
+            // 8.冲突状况
+            // 8(1).split存在该文件，cur中该文件被修改，tar中该文件被删除
+            } else if (splitB != null && curB != null && tarB == null && curB.getContents() != splitB.getContents()) {
+                mergeFileContents(fileName, curB.getContents(), null);
+            // 8(2).split存在该文件，cur中该文件被删除，tar中该文件被修改
+            } else if (splitB != null && curB == null && tarB != null && tarB.getContents() != splitB.getContents()) {
+                mergeFileContents(fileName, null, tarB.getContents());
+            // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
+            } else if (splitB != null && curB != null && tarB != null && tarB.getContents() != splitB.getContents()
+                    && curB.getContents() != splitB.getContents() && curB.getContents() != tarB.getContents()) {
+                mergeFileContents(fileName, curB.getContents(), tarB.getContents());
+            // 8(4).split不存在该文件，cur, tar均添加该文件，且内容不一致
+            } else if (splitB == null && curB != null & tarB != null && tarB.getContents() != curB.getContents()) {
+                mergeFileContents(fileName, curB.getContents(), tarB.getContents());
+            }
+            // 更新完毕，生成提交ing...
+            commit("Merged " + tarBranch + " into " + curBranch, );
+        }
+    }
 }
