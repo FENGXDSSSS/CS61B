@@ -638,10 +638,10 @@ public class Repository {
             tarStr = new String(tarCont, StandardCharsets.UTF_8);
         }
         contentsOfFile.append(curStr);
-        contentsOfFile.append("\n" + "=======");
+        contentsOfFile.append("=======" + "\n");
         contentsOfFile.append(tarStr);
-        contentsOfFile.append("\n" + ">>>>>>>");
-        Utils.writeObject(fileDir, contentsOfFile);
+        contentsOfFile.append(">>>>>>>");
+        Utils.writeContents(fileDir, contentsOfFile.toString());
     }
 
     // 统计未当前提交中的未追踪文件
@@ -724,20 +724,28 @@ public class Repository {
             // split, cur, tar中均存在该文件
             if (splitB != null && curB != null && tarB != null) {
                 // 1.cur中文件未修改，tar中文件修改 --> 文件从给定分支中检出并暂存
-                if (splitB.getContents() == curB.getContents()
+                if (Arrays.equals(splitB.getContents(), curB.getContents())
                         && !Arrays.equals(splitB.getContents(), tarB.getContents())) {
                     mergeCheckout(fileName, tarB.getContents());
                     bufferAdd.add(fileName, tarB.getContents()); // 暂存暂存文件
                 }
                 // 2.cur中文件修改，tar中文件未修改 --> 保持原样
-                if (splitB.getContents() != curB.getContents()
+                if (Arrays.equals(splitB.getContents(), curB.getContents())
                         && Arrays.equals(splitB.getContents(), tarB.getContents())) {
                     continue;
                 }
                 // 3.cur, tar一同修改且内容一致 --> 原样不变
-                if (curB.getContents() == tarB.getContents()
+                if (Arrays.equals(curB.getContents(), tarB.getContents())
                         && !Arrays.equals(curB.getContents(), splitB.getContents())) {
                     continue;
+                }
+                // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
+                if (!Arrays.equals(tarB.getContents(), splitB.getContents())
+                        && !Arrays.equals(curB.getContents(), splitB.getContents())
+                        && !Arrays.equals(curB.getContents(), tarB.getContents())) {
+                    mergeFileContents(fileName, curB.getContents(), tarB.getContents());
+                    bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
+                    isConflict = true;
                 }
                 // 4.split, cur不存在该文件，tar存在该文件 --> 检出该文件并暂存
             } else if (splitB == null && curB == null && tarB != null) {
@@ -768,14 +776,6 @@ public class Repository {
             } else if (splitB != null && curB == null && tarB != null
                     && !Arrays.equals(tarB.getContents(), splitB.getContents())) {
                 mergeFileContents(fileName, null, tarB.getContents());
-                bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
-                isConflict = true;
-                // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
-            } else if (splitB != null && curB != null && tarB != null
-                    && !Arrays.equals(tarB.getContents(), splitB.getContents())
-                    && !Arrays.equals(curB.getContents(), splitB.getContents())
-                    && !Arrays.equals(curB.getContents(), tarB.getContents())) {
-                mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
                 // 8(4).split不存在该文件，cur, tar均添加该文件，且内容不一致
