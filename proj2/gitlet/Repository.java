@@ -659,7 +659,8 @@ public class Repository {
     }
 
     private static boolean isUnstackedFail(Commit curCommit, HashMap<String, String> curFilesMap,
-                                           HashMap<String, String> splitFilesMap, HashMap<String, String> tarFilesMap) {
+                                           HashMap<String, String> splitFilesMap,
+                                           HashMap<String, String> tarFilesMap) {
         Blob splitB = null;
         Blob curB = null;
         Blob tarB = null;
@@ -698,10 +699,10 @@ public class Repository {
     }
 
     private static Blob getBlob(String fileName,
-                                HashMap<String, String> FilesMap) {
+                                HashMap<String, String> filesMap) {
         Blob blob1 = null;
-        if (FilesMap.containsKey(FilesMap)) {
-            blob1 = Blob.readFromFile(FilesMap.get(fileName));
+        if (filesMap.containsKey(filesMap)) {
+            blob1 = Blob.readFromFile(filesMap.get(fileName));
         } else {
             blob1 = null;
         }
@@ -709,8 +710,10 @@ public class Repository {
     }
 
     // 完成merge的工作区文件修改
-    private static boolean modifyOfMerge(HashSet<String> allFileSet, HashMap<String, String> splitFilesMap,
-                                         HashMap<String, String> curFilesMap, HashMap<String, String> tarFilesMap) {
+    private static boolean modifyOfMerge(HashSet<String> allFileSet,
+                                         HashMap<String, String> splitFilesMap,
+                                         HashMap<String, String> curFilesMap,
+                                         HashMap<String, String> tarFilesMap) {
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
         boolean isConflict = false;
@@ -724,8 +727,7 @@ public class Repository {
                 if (splitB.getContents() == curB.getContents()
                         && splitB.getContents() != tarB.getContents()) {
                     mergeCheckout(fileName, tarB.getContents());
-                    // 暂存暂存文件
-                    bufferAdd.add(fileName, tarB.getContents());
+                    bufferAdd.add(fileName, tarB.getContents()); // 暂存暂存文件
                 }
                 // 2.cur中文件修改，tar中文件未修改 --> 保持原样
                 if (splitB.getContents() != curB.getContents()
@@ -832,8 +834,8 @@ public class Repository {
         HashMap<String, String> curFilesMap = getFilesMapFromOne(curCommit);
         HashMap<String, String> tarFilesMap = getFilesMapFromOne(tarCommit);
         // 检查当前提交中的未跟踪文件是否会被此次merge覆盖或者删除
-        boolean UnstackedFail = isUnstackedFail(curCommit, curFilesMap, splitFilesMap, tarFilesMap);
-        if (UnstackedFail) {
+        boolean unstackedFail = isUnstackedFail(curCommit, curFilesMap, splitFilesMap, tarFilesMap);
+        if (unstackedFail) {
             return;
         }
         // 检查是否存在冲突
@@ -843,7 +845,7 @@ public class Repository {
         // 更新完毕，生成提交ing...
         String curBranch = branch.getCurrentBranch();
     commit("Merged " + tarBranch + " into "
-            + curBranch + ".", curBranchCommitID, tarBranchCommitID);
+                + curBranch + ".", curBranchCommitID, tarBranchCommitID);
     }
 
     // m处理erge时存在已暂存的添加或删除操作未提交的错误
