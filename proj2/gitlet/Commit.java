@@ -83,6 +83,15 @@ public class Commit implements Serializable {
         }
     }
 
+    // 取消指定文件再当前Commit中的追踪状态
+    public void deleStacked(String fileName) {
+        if (stackedBlob.containsKey(fileName)) {
+            return;
+        } else {
+            stackedBlob.remove(fileName);
+        }
+    }
+
     // 获取改提交的深度
     public int getDepth() {
         return depth;
@@ -165,7 +174,7 @@ public class Commit implements Serializable {
     private int depth;
     private String messages;
     private long timestemp;
-    // 文件名/has
+    // 文件名 --> BlobHash
     private TreeMap<String, String> stackedBlob;
     private String firstLast;
     private String secondLast;

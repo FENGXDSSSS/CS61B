@@ -144,7 +144,7 @@ public class Repository {
         return updatedStacked;
     }
 
-    public static void commit(String message, String firstLast, String secondLast) {
+    public static void commit(String message, String firstCommitID, String secondCommitID) {
         // 缓存区文件载入
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
@@ -167,11 +167,16 @@ public class Repository {
         String head = branch.getHEAD();
         // 当前commit -> Head 载入
         Commit currentCommit = Commit.readFromFile(head);
-        // 更新追踪列表
+        // 更新追踪列表, (拷贝main父提交, 根据bufferAdd，bufferRm修改夫提交内容计入当前提交的追踪)
         Map<String, String> stacked = updateStacked(currentCommit, bufferAdd, bufferRm);
         // 新建commit实例
         int lastDepth = currentCommit.getDepth();
-        Commit newCommit = new Commit(message, userName, new Date().getTime(), head, " ", lastDepth, stacked);
+        Commit newCommit = null;
+        if (firstCommitID == null && secondCommitID == null) {
+            newCommit = new Commit(message, userName, new Date().getTime(), head, " ", lastDepth, stacked);
+        } else {
+            newCommit = new Commit(message, userName, new Date().getTime(), firstCommitID, secondCommitID, lastDepth, stacked);
+        }
         head = newCommit.getSha1();
         // 重新设置到当前分支当前指针上
         branch.setHEAD(head);
@@ -720,31 +725,39 @@ public class Repository {
             } else if (splitB == null && curB != null && tarB == null) {
                 // 原样保持
                 continue;
-            // 6.split, cur存在该文件，tar不存在该文件，且该文件在cur中未修改 --> 删除，并标记为为跟踪状态
+            // 6.split, cur存在该文件，tar不存在该文件，且该文件在cur中未修改 --> 删除，并标记为未跟踪状态
             } else if (splitB != null && curB != null && tarB == null && curB.getContents() == splitB.getContents()) {
                 // 删除该文件
                 deleFile(fileName);
-                // 无需手动设置未为追踪状态
+                bufferRm.add(fileName);
             // 7.split, tar存在该文件，cur不存在该文件，且该文件在cur中未修改 --> 保持原样
             } else if (splitB != null && curB == null && tarB != null && tarB.getContents() == splitB.getContents()) {
                 continue;
-            // 8.冲突状况
+            // 8.冲突状况, 全部递交给暂存区
             // 8(1).split存在该文件，cur中该文件被修改，tar中该文件被删除
             } else if (splitB != null && curB != null && tarB == null && curB.getContents() != splitB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), null);
+                bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
             // 8(2).split存在该文件，cur中该文件被删除，tar中该文件被修改
             } else if (splitB != null && curB == null && tarB != null && tarB.getContents() != splitB.getContents()) {
                 mergeFileContents(fileName, null, tarB.getContents());
+                bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
             // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
             } else if (splitB != null && curB != null && tarB != null && tarB.getContents() != splitB.getContents()
                     && curB.getContents() != splitB.getContents() && curB.getContents() != tarB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
+                bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
             // 8(4).split不存在该文件，cur, tar均添加该文件，且内容不一致
             } else if (splitB == null && curB != null & tarB != null && tarB.getContents() != curB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
+                bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
             }
+            // 保存buffer，branch以便commit方法使用数据
+            bufferAdd.save();
+            bufferRm.save();
+            branch.save();
             // 更新完毕，生成提交ing...
-            commit("Merged " + tarBranch + " into " + curBranch, );
+            commit("Merged " + tarBranch + " into " + curBranch, curBranchCommitID, tarBranchCommitID);
         }
     }
 }
