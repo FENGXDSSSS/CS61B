@@ -4,6 +4,7 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Blob implements Serializable {
     // 同Commit一旦建立后续无需更改，构造之初即可序列化
@@ -23,6 +24,23 @@ public class Blob implements Serializable {
 
     public byte[] getContents() {
         return contents;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+        Blob otherBlob = (Blob) o;
+        return Arrays.equals(contents, otherBlob.getContents());
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(contents);
     }
 
     public void save() {

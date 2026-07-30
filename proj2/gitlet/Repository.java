@@ -701,7 +701,7 @@ public class Repository {
     private static Blob getBlob(String fileName,
                                 HashMap<String, String> filesMap) {
         Blob blob1 = null;
-        if (filesMap.containsKey(filesMap)) {
+        if (filesMap.containsKey(fileName)) {
             blob1 = Blob.readFromFile(filesMap.get(fileName));
         } else {
             blob1 = null;
@@ -725,18 +725,18 @@ public class Repository {
             if (splitB != null && curB != null && tarB != null) {
                 // 1.cur中文件未修改，tar中文件修改 --> 文件从给定分支中检出并暂存
                 if (splitB.getContents() == curB.getContents()
-                        && splitB.getContents() != tarB.getContents()) {
+                        && !Arrays.equals(splitB.getContents(), tarB.getContents())) {
                     mergeCheckout(fileName, tarB.getContents());
                     bufferAdd.add(fileName, tarB.getContents()); // 暂存暂存文件
                 }
                 // 2.cur中文件修改，tar中文件未修改 --> 保持原样
                 if (splitB.getContents() != curB.getContents()
-                        && splitB.getContents() == tarB.getContents()) {
+                        && Arrays.equals(splitB.getContents(), tarB.getContents())) {
                     continue;
                 }
                 // 3.cur, tar一同修改且内容一致 --> 原样不变
                 if (curB.getContents() == tarB.getContents()
-                        && curB.getContents() != splitB.getContents()) {
+                        && !Arrays.equals(curB.getContents(), splitB.getContents())) {
                     continue;
                 }
                 // 4.split, cur不存在该文件，tar存在该文件 --> 检出该文件并暂存
@@ -750,37 +750,37 @@ public class Repository {
                 continue;
                 // 6.split, cur存在该文件，tar不存在该文件，且该文件在cur中未修改 --> 删除，并标记为未跟踪状态
             } else if (splitB != null && curB != null && tarB == null
-                    && curB.getContents() == splitB.getContents()) {
+                    && Arrays.equals(curB.getContents(), splitB.getContents())) {
                 // 删除该文件
                 deleFile(fileName);
                 bufferRm.add(fileName);
                 // 7.split, tar存在该文件，cur不存在该文件，且该文件在cur中未修改 --> 保持原样
             } else if (splitB != null && curB == null && tarB != null
-                    && tarB.getContents() == splitB.getContents()) {
+                    && Arrays.equals(tarB.getContents(), splitB.getContents())) {
                 continue;
                 // 8.冲突状况, 全部递交给暂存区，8(1).split存在该文件，cur中该文件被修改，tar中该文件被删除
             } else if (splitB != null && curB != null && tarB == null
-                    && curB.getContents() != splitB.getContents()) {
+                    && !Arrays.equals(curB.getContents(), splitB.getContents())) {
                 mergeFileContents(fileName, curB.getContents(), null);
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
                 // 8(2).split存在该文件，cur中该文件被删除，tar中该文件被修改
             } else if (splitB != null && curB == null && tarB != null
-                    && tarB.getContents() != splitB.getContents()) {
+                    && !Arrays.equals(tarB.getContents(), splitB.getContents())) {
                 mergeFileContents(fileName, null, tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
                 // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
             } else if (splitB != null && curB != null && tarB != null
-                    && tarB.getContents() != splitB.getContents()
-                    && curB.getContents() != splitB.getContents()
-                    && curB.getContents() != tarB.getContents()) {
+                    && !Arrays.equals(tarB.getContents(), splitB.getContents())
+                    && !Arrays.equals(curB.getContents(), splitB.getContents())
+                    && !Arrays.equals(curB.getContents(), tarB.getContents())) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
                 // 8(4).split不存在该文件，cur, tar均添加该文件，且内容不一致
             } else if (splitB == null && curB != null & tarB != null
-                    && tarB.getContents() != curB.getContents()) {
+                    && !Arrays.equals(tarB.getContents(), curB.getContents())) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
@@ -853,7 +853,7 @@ public class Repository {
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
         // 如果存在已暂存的添加或删除操作，输出错误信息：
-        if (bufferAdd.isEmpty() || bufferRm.isEmpty()) {
+        if (!bufferAdd.isEmpty() || !bufferRm.isEmpty()) {
             System.out.println("You have uncommitted changes.");
             return true;
         }
@@ -863,7 +863,7 @@ public class Repository {
     // 处理merge时分支名称不存在的错误
     private static boolean tarBranchNotExist(Branch branch, String tarBranch) {
         // 如果当前分支将于自身分支合并，输出错误信息
-        if (branch.branchIsContained(tarBranch)) {
+        if (!branch.branchIsContained(tarBranch)) {
             System.out.println("A branch with that name does not exist.");
             return true;
         }
