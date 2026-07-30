@@ -173,11 +173,11 @@ public class Repository {
         int lastDepth = currentCommit.getDepth();
         Commit newCommit = null;
         if (firstCommitID == null && secondCommitID == null) {
-            newCommit = new Commit(message, userName, new Date().getTime()
-                    , head, " ", lastDepth, stacked);
+            newCommit = new Commit(message, userName, new Date().getTime(),
+                    head, " ", lastDepth, stacked);
         } else {
-            newCommit = new Commit(message, userName, new Date().getTime()
-                    , firstCommitID, secondCommitID, lastDepth, stacked);
+            newCommit = new Commit(message, userName, new Date().getTime(),
+                    firstCommitID, secondCommitID, lastDepth, stacked);
         }
         head = newCommit.getSha1();
         // 重新设置到当前分支当前指针上
@@ -537,7 +537,7 @@ public class Repository {
                 return -(o1.getDepth() - o2.getDepth());
             }
         });
-       String splitCommitID = "";
+        String splitCommitID = "";
         HashSet<String> commitSet = curBranchAllPoint(curBranchCommit);
 
         Commit tarCommit = Commit.readFromFile(tarBranchCommit);
@@ -697,7 +697,7 @@ public class Repository {
         // 如果split为当前分支，检出给定分支点，不改变当前分支
         if (curBranchCommitID.equals(splitCommitID)) {
             // 更新工作区, 参数为Commit
-            update(curCommit , tarCommit);
+            update(curCommit, tarCommit);
             // 当前分支更新该提交
             branch.updateCurBranchHead(tarBranchCommitID);
             System.out.println("Current branch fast-forwarded.");
@@ -741,7 +741,8 @@ public class Repository {
                         + "delete it, or add and commit it first.");
                 return;
             // 情况8(2)
-            } else if (splitB != null && curB == null && tarB != null && tarB.getContents() != splitB.getContents()) {
+            } else if (splitB != null && curB == null && tarB != null
+                    && tarB.getContents() != splitB.getContents()) {
                 System.out.println("There is an untracked file in the way; "
                         + "delete it, or add and commit it first.");
                 return;
@@ -771,18 +772,21 @@ public class Repository {
             // split, cur, tar中均存在该文件
             if (splitB != null && curB != null && tarB != null) {
                 // 1.cur中文件未修改，tar中文件修改 --> 文件从给定分支中检出并暂存
-                if (splitB.getContents() == curB.getContents() && splitB.getContents() != tarB.getContents()) {
+                if (splitB.getContents() == curB.getContents()
+                        && splitB.getContents() != tarB.getContents()) {
                     mergeCheckout(fileName, tarB.getContents());
                     // 暂存暂存文件
                     bufferAdd.add(fileName, tarB.getContents());
                 }
                 // 2.cur中文件修改，tar中文件未修改 --> 保持原样
-                if (splitB.getContents() != curB.getContents() && splitB.getContents() == tarB.getContents()) {
+                if (splitB.getContents() != curB.getContents()
+                        && splitB.getContents() == tarB.getContents()) {
                     // 原样不变
                     continue;
                 }
                 // 3.cur, tar一同修改且内容一致 --> 原样不变
-                if (curB.getContents() == tarB.getContents() && curB.getContents() != splitB.getContents()) {
+                if (curB.getContents() == tarB.getContents()
+                        && curB.getContents() != splitB.getContents()) {
                     // 原样不变
                     continue;
                 }
@@ -797,32 +801,38 @@ public class Repository {
                 // 原样保持
                 continue;
             // 6.split, cur存在该文件，tar不存在该文件，且该文件在cur中未修改 --> 删除，并标记为未跟踪状态
-            } else if (splitB != null && curB != null && tarB == null && curB.getContents() == splitB.getContents()) {
+            } else if (splitB != null && curB != null && tarB == null
+                    && curB.getContents() == splitB.getContents()) {
                 // 删除该文件
                 deleFile(fileName);
                 bufferRm.add(fileName);
             // 7.split, tar存在该文件，cur不存在该文件，且该文件在cur中未修改 --> 保持原样
-            } else if (splitB != null && curB == null && tarB != null && tarB.getContents() == splitB.getContents()) {
+            } else if (splitB != null && curB == null && tarB != null
+                    && tarB.getContents() == splitB.getContents()) {
                 continue;
             // 8.冲突状况, 全部递交给暂存区
             // 8(1).split存在该文件，cur中该文件被修改，tar中该文件被删除
-            } else if (splitB != null && curB != null && tarB == null && curB.getContents() != splitB.getContents()) {
+            } else if (splitB != null && curB != null && tarB == null
+                    && curB.getContents() != splitB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), null);
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
             // 8(2).split存在该文件，cur中该文件被删除，tar中该文件被修改
-            } else if (splitB != null && curB == null && tarB != null && tarB.getContents() != splitB.getContents()) {
+            } else if (splitB != null && curB == null && tarB != null
+                    && tarB.getContents() != splitB.getContents()) {
                 mergeFileContents(fileName, null, tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
             // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
-            } else if (splitB != null && curB != null && tarB != null && tarB.getContents() != splitB.getContents()
+            } else if (splitB != null && curB != null && tarB != null
+                    && tarB.getContents() != splitB.getContents()
                     && curB.getContents() != splitB.getContents() && curB.getContents() != tarB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
             // 8(4).split不存在该文件，cur, tar均添加该文件，且内容不一致
-            } else if (splitB == null && curB != null & tarB != null && tarB.getContents() != curB.getContents()) {
+            } else if (splitB == null && curB != null & tarB != null
+                    && tarB.getContents() != curB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
@@ -836,7 +846,8 @@ public class Repository {
                 System.out.println("Encountered a merge conflict.");
             }
             // 更新完毕，生成提交ing...
-            commit("Merged " + tarBranch + " into " + curBranch + ".", curBranchCommitID, tarBranchCommitID);
+            commit("Merged " + tarBranch + " into "
+                    + curBranch + ".", curBranchCommitID, tarBranchCommitID);
         }
     }
 }
