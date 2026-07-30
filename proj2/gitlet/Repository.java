@@ -383,7 +383,7 @@ public class Repository {
         if (branch.isCurrentBranch(branchName)) {
             System.out.println("No need to checkout the current branch.");
             return;
-        } else if (!branch.curBranchIsContained(branchName)) {
+        } else if (!branch.branchIsContained(branchName)) {
             System.out.println("No such branch exists.");
             return;
         } else {
@@ -431,7 +431,7 @@ public class Repository {
     public static void rmBranch(String branchName) {
         // 取出branch入内存
         Branch branch = Branch.readFromFile();
-        if (!branch.curBranchIsContained(branchName)) {
+        if (!branch.branchIsContained(branchName)) {
             System.out.println("A branch with that name does not exist.");
             return;
         } else if (branch.isCurrentBranch(branchName)) {
@@ -635,13 +635,47 @@ public class Repository {
         Utils.writeObject(fileDir, contentsOfFile);
     }
 
+    // 统计未当前提交中的未追踪文件
+    private static HashSet<String> getUnstacked(Commit tarCommit) {
+        List<String> filesList = Utils.plainFilenamesIn(CWD);
+        HashSet<String> resultSet = new HashSet<>();
+        // 遍历文件列表
+        for (String fileName : filesList) {
+            // 不存在与stackedBlob中的文件被计入resultSet中
+            if (!tarCommit.containStacked(fileName)) {
+                resultSet.add(fileName);
+            }
+        }
+        return resultSet;
+    }
+
     public static void merge(String tarBranch) {
         // 反序列化
         Branch branch = Branch.readFromFile();
         BufferAdd bufferAdd = BufferAdd.readFromFile();
         BufferRm bufferRm = BufferRm.readFromFile();
+
+        // 如果存在已暂存的添加或删除操作，输出错误信息：
+        if (bufferAdd.isEmpty() || bufferRm.isEmpty()) {
+            System.out.println("You have uncommitted changes.");
+            return;
+        }
+
+        // 如果给定的分支名称不存在, 输出错误信息:
+        if (branch.branchIsContained(tarBranch)) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
+
         // 获取当前分支名称
         String curBranch = branch.getCurrentBranch();
+
+        // 如果当前分支将于自身分支合并，输出错误信息
+        if (curBranch.equals(tarBranch)) {
+            System.out.println("Cannot merge a branch with itself.");
+            return;
+        }
+
         // 获取两个分支的最新提交
         String curBranchCommitID = branch.getHEAD();
         String tarBranchCommitID = branch.getTargetHead(tarBranch);
@@ -679,6 +713,41 @@ public class Repository {
         Blob splitB = null;
         Blob curB = null;
         Blob tarB = null;
+
+        // 检查当前提交中的未跟踪文件是否会被此次merge覆盖或者删除
+        // 筛选当前分支的未跟踪文件
+        HashSet<String> unstacked = getUnstacked(curCommit);
+        for (String fileName : unstacked) {
+            if (splitFilesMap.containsKey(fileName)) {
+                splitB = Blob.readFromFile(splitFilesMap.get(fileName));
+            } else {
+                splitB = null;
+            }
+            if (curFilesMap.containsKey(fileName)) {
+                curB = Blob.readFromFile(curFilesMap.get(fileName));
+            } else {
+                curB = null;
+            }
+            if (tarFilesMap.containsKey(fileName)) {
+                tarB = Blob.readFromFile(tarFilesMap.get(fileName));
+            } else {
+                tarB = null;
+            }
+            // 情况4
+            if (splitB == null && curB == null && tarB != null) {
+                System.out.println("There is an untracked file in the way; "
+                        + "delete it, or add and commit it first.");
+                return;
+            // 情况8(2)
+            } else if (splitB != null && curB == null && tarB != null && tarB.getContents() != splitB.getContents()) {
+                System.out.println("There is an untracked file in the way; "
+                        + "delete it, or add and commit it first.");
+                return;
+            }
+        }
+
+        // 是否冲突
+        boolean isConflict = false;
 
         // 遍历allFiles
         for (String fileName : allFileSet) {
@@ -738,26 +807,34 @@ public class Repository {
             } else if (splitB != null && curB != null && tarB == null && curB.getContents() != splitB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), null);
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
+                isConflict = true;
             // 8(2).split存在该文件，cur中该文件被删除，tar中该文件被修改
             } else if (splitB != null && curB == null && tarB != null && tarB.getContents() != splitB.getContents()) {
                 mergeFileContents(fileName, null, tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
+                isConflict = true;
             // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
             } else if (splitB != null && curB != null && tarB != null && tarB.getContents() != splitB.getContents()
                     && curB.getContents() != splitB.getContents() && curB.getContents() != tarB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
+                isConflict = true;
             // 8(4).split不存在该文件，cur, tar均添加该文件，且内容不一致
             } else if (splitB == null && curB != null & tarB != null && tarB.getContents() != curB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
+                isConflict = true;
             }
             // 保存buffer，branch以便commit方法使用数据
             bufferAdd.save();
             bufferRm.save();
             branch.save();
+            // 检查是否存在冲突
+            if (isConflict) {
+                System.out.println("Encountered a merge conflict.");
+            }
             // 更新完毕，生成提交ing...
-            commit("Merged " + tarBranch + " into " + curBranch, curBranchCommitID, tarBranchCommitID);
+            commit("Merged " + tarBranch + " into " + curBranch + ".", curBranchCommitID, tarBranchCommitID);
         }
     }
 }

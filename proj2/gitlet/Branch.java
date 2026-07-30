@@ -24,13 +24,13 @@ public class Branch implements Serializable {
     }
 
     // 分支是否已创建
-    public boolean curBranchIsContained(String branchName) {
+    public boolean branchIsContained(String branchName) {
         return branchMap.containsKey(branchName);
     }
 
     // 创建分支
     public boolean createBranch(String branchName) {
-        if (curBranchIsContained(branchName)) {
+        if (branchIsContained(branchName)) {
             System.out.println("A branch with that name already exists.");
             return false;
         }
