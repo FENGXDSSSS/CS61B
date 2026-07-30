@@ -20,8 +20,8 @@ public class Commit implements Serializable {
      */
     // 由于提交一旦建立就无后续更改，所以构造之初就可序列化
     // stackedBlob1 在init命令中为null
-    public Commit(String message, String author,
-                  long time, String firstLast, String secondLast, int lastDepth, Map<String, String> stackedBlob1) {
+    public Commit(String message, String author, long time, String firstLast
+            , String secondLast, int lastDepth, Map<String, String> stackedBlob1) {
         // 消息
         this.messages = message;
         // 时间戳
@@ -40,7 +40,8 @@ public class Commit implements Serializable {
         this.author = author;
         // hash计算
         byte[] stackStr = Utils.serialize(stackedBlob);
-        this.sha1 = Utils.sha1(message, author, String.valueOf(timestemp), firstLast, secondLast, stackStr);
+        this.sha1 = Utils.sha1(message, author, String.valueOf(timestemp)
+                , firstLast, secondLast, stackStr);
 
     }
     /** The message of this Commit. */
@@ -169,6 +170,11 @@ public class Commit implements Serializable {
         }
         Commit commit = (Commit) o;
         return this.getSha1().equals(commit.getSha1());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSha1());
     }
 
     private int depth;

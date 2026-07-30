@@ -173,9 +173,11 @@ public class Repository {
         int lastDepth = currentCommit.getDepth();
         Commit newCommit = null;
         if (firstCommitID == null && secondCommitID == null) {
-            newCommit = new Commit(message, userName, new Date().getTime(), head, " ", lastDepth, stacked);
+            newCommit = new Commit(message, userName, new Date().getTime()
+                    , head, " ", lastDepth, stacked);
         } else {
-            newCommit = new Commit(message, userName, new Date().getTime(), firstCommitID, secondCommitID, lastDepth, stacked);
+            newCommit = new Commit(message, userName, new Date().getTime()
+                    , firstCommitID, secondCommitID, lastDepth, stacked);
         }
         head = newCommit.getSha1();
         // 重新设置到当前分支当前指针上
