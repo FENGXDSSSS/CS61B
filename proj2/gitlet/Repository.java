@@ -628,10 +628,10 @@ public class Repository {
         String tarStr;
         StringBuilder contentsOfFile = new StringBuilder("<<<<<<< HEAD\n");
         if (curCont == null) {
-            curStr = "\n";
+            curStr = "";
             tarStr = new String(tarCont, StandardCharsets.UTF_8);
         } else if (tarCont == null) {
-            tarStr = "\n";
+            tarStr = "";
             curStr = new String(curCont, StandardCharsets.UTF_8);
         } else {
             curStr = new String(curCont, StandardCharsets.UTF_8);
