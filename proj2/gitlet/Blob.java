@@ -4,7 +4,6 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Objects;
 
 public class Blob implements Serializable {
     // 同Commit一旦建立后续无需更改，构造之初即可序列化
