@@ -844,8 +844,8 @@ public class Repository {
         }
         // 更新完毕，生成提交ing...
         String curBranch = branch.getCurrentBranch();
-    commit("Merged " + tarBranch + " into " + curBranch + ".",
-                curBranchCommitID, tarBranchCommitID);
+        commit("Merged " + tarBranch + " into " + curBranch + ".",
+            curBranchCommitID, tarBranchCommitID);
     }
 
     // m处理erge时存在已暂存的添加或删除操作未提交的错误
