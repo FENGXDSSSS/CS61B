@@ -21,10 +21,14 @@ public class Repository {
      * variable is used. We've provided two examples for you.
      */
 
-    /** The current working directory. */
+    /**
+     * The current working directory.
+     */
     private static String userName = "user";
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
+    /**
+     * The .gitlet directory.
+     */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     // 对象目录
     public static final File OBJECT_DIR = join(GITLET_DIR, "object");
@@ -36,6 +40,7 @@ public class Repository {
     public static final File BRANCH_DIR = join(GITLET_DIR, "branch");
     // 未追踪文件目录
     public static final File UNSTACKED_DIR = join(GITLET_DIR, "unstacked");
+
     public static void init() {
         // 创建目录
         if (!GITLET_DIR.mkdir()) {
@@ -52,8 +57,8 @@ public class Repository {
         BRANCH_DIR.mkdir();
         UNSTACKED_DIR.mkdir();
         // 初始化用户名，待完善
-            // 用户名定义移出方法
-            // 下次调用gitlet，用户名不会保存，值为null
+        // 用户名定义移出方法
+        // 下次调用gitlet，用户名不会保存，值为null
         // 初始化各部件
         // 初始提交
         // 获取当前时间戳new Date().getTime();
@@ -249,6 +254,7 @@ public class Repository {
 
         logHelper(head);
     }
+
     // 全局log
     public static void globalLog() {
         List<String> commitList;
@@ -316,7 +322,7 @@ public class Repository {
         if (curCommit != null && curCommit.fileIsStacked(fileName)) {
             byte[] contents = curCommit.getStackedFileContents(fileName);
             writeContents(fileDir, (Object) contents);
-        }  else {
+        } else {
             System.out.println("File does not exist in that commit.");
         }
     }
@@ -455,7 +461,8 @@ public class Repository {
         Commit curCommit = getThatCommit(branch.getHEAD());
         Commit targetCommit = getThatCommit(commitID);
         if (targetCommit == null) {
-            System.out.println("No commit with that id exists."); return;
+            System.out.println("No commit with that id exists.");
+            return;
         }
 
         List<String> files = plainFilenamesIn(CWD);
@@ -651,72 +658,11 @@ public class Repository {
         return resultSet;
     }
 
-    public static void merge(String tarBranch) {
-        // 反序列化
-        Branch branch = Branch.readFromFile();
-        BufferAdd bufferAdd = BufferAdd.readFromFile();
-        BufferRm bufferRm = BufferRm.readFromFile();
-
-        // 如果存在已暂存的添加或删除操作，输出错误信息：
-        if (bufferAdd.isEmpty() || bufferRm.isEmpty()) {
-            System.out.println("You have uncommitted changes.");
-            return;
-        }
-
-        // 如果给定的分支名称不存在, 输出错误信息:
-        if (branch.branchIsContained(tarBranch)) {
-            System.out.println("A branch with that name does not exist.");
-            return;
-        }
-
-        // 获取当前分支名称
-        String curBranch = branch.getCurrentBranch();
-
-        // 如果当前分支将于自身分支合并，输出错误信息
-        if (curBranch.equals(tarBranch)) {
-            System.out.println("Cannot merge a branch with itself.");
-            return;
-        }
-
-        // 获取两个分支的最新提交
-        String curBranchCommitID = branch.getHEAD();
-        String tarBranchCommitID = branch.getTargetHead(tarBranch);
-        // 获取两分支的共同祖先
-        String splitCommitID = getSplitBranch(curBranchCommitID, tarBranchCommitID);
-
-        // 如果split为给定分支，不进行操作
-        if (tarBranchCommitID.equals(splitCommitID)) {
-            System.out.println("Given branch is an ancestor of the current branch.");
-            return;
-        }
-
-        Commit curCommit = Commit.readFromFile(curBranchCommitID);
-        Commit tarCommit = Commit.readFromFile(tarBranchCommitID);
-        Commit splitCommit = Commit.readFromFile(splitCommitID);
-
-        // 如果split为当前分支，检出给定分支点，不改变当前分支
-        if (curBranchCommitID.equals(splitCommitID)) {
-            // 更新工作区, 参数为Commit
-            update(curCommit, tarCommit);
-            // 当前分支更新该提交
-            branch.updateCurBranchHead(tarBranchCommitID);
-            System.out.println("Current branch fast-forwarded.");
-            branch.save();
-            return;
-        }
-
-        // 获取四个映射
-        // (allFiles, split, current, target)
-        HashSet<String> allFileSet = getAllFilesSet(splitCommit, curCommit, tarCommit);
-        HashMap<String, String> splitFilesMap = getFilesMapFromOne(splitCommit);
-        HashMap<String, String> curFilesMap = getFilesMapFromOne(curCommit);
-        HashMap<String, String> tarFilesMap = getFilesMapFromOne(tarCommit);
-
+    private static boolean isUnstackedFail(Commit curCommit, HashMap<String, String> curFilesMap,
+                                           HashMap<String, String> splitFilesMap, HashMap<String, String> tarFilesMap) {
         Blob splitB = null;
         Blob curB = null;
         Blob tarB = null;
-
-        // 检查当前提交中的未跟踪文件是否会被此次merge覆盖或者删除
         // 筛选当前分支的未跟踪文件
         HashSet<String> unstacked = getUnstacked(curCommit);
         for (String fileName : unstacked) {
@@ -739,36 +685,39 @@ public class Repository {
             if (splitB == null && curB == null && tarB != null) {
                 System.out.println("There is an untracked file in the way; "
                         + "delete it, or add and commit it first.");
-                return;
-            // 情况8(2)
+                return true;
+                // 情况8(2)
             } else if (splitB != null && curB == null && tarB != null
                     && tarB.getContents() != splitB.getContents()) {
                 System.out.println("There is an untracked file in the way; "
                         + "delete it, or add and commit it first.");
-                return;
+                return true;
             }
         }
+        return false;
+    }
 
-        // 是否冲突
+    private static Blob getBlob(String fileName,
+                                HashMap<String, String> FilesMap) {
+        Blob blob1 = null;
+        if (FilesMap.containsKey(FilesMap)) {
+            blob1 = Blob.readFromFile(FilesMap.get(fileName));
+        } else {
+            blob1 = null;
+        }
+        return blob1;
+    }
+
+    // 完成merge的工作区文件修改
+    private static boolean modifyOfMerge(HashSet<String> allFileSet, HashMap<String, String> splitFilesMap,
+                                         HashMap<String, String> curFilesMap, HashMap<String, String> tarFilesMap) {
+        BufferAdd bufferAdd = BufferAdd.readFromFile();
+        BufferRm bufferRm = BufferRm.readFromFile();
         boolean isConflict = false;
-
-        // 遍历allFiles
         for (String fileName : allFileSet) {
-            if (splitFilesMap.containsKey(fileName)) {
-                splitB = Blob.readFromFile(splitFilesMap.get(fileName));
-            } else {
-                splitB = null;
-            }
-            if (curFilesMap.containsKey(fileName)) {
-                curB = Blob.readFromFile(curFilesMap.get(fileName));
-            } else {
-                curB = null;
-            }
-            if (tarFilesMap.containsKey(fileName)) {
-                tarB = Blob.readFromFile(tarFilesMap.get(fileName));
-            } else {
-                tarB = null;
-            }
+            Blob splitB = getBlob(fileName, splitFilesMap);
+            Blob curB = getBlob(fileName, curFilesMap);
+            Blob tarB = getBlob(fileName, tarFilesMap);
             // split, cur, tar中均存在该文件
             if (splitB != null && curB != null && tarB != null) {
                 // 1.cur中文件未修改，tar中文件修改 --> 文件从给定分支中检出并暂存
@@ -781,73 +730,152 @@ public class Repository {
                 // 2.cur中文件修改，tar中文件未修改 --> 保持原样
                 if (splitB.getContents() != curB.getContents()
                         && splitB.getContents() == tarB.getContents()) {
-                    // 原样不变
                     continue;
                 }
                 // 3.cur, tar一同修改且内容一致 --> 原样不变
                 if (curB.getContents() == tarB.getContents()
                         && curB.getContents() != splitB.getContents()) {
-                    // 原样不变
                     continue;
                 }
-            // 4.split, cur不存在该文件，tar存在该文件 --> 检出该文件并暂存
+                // 4.split, cur不存在该文件，tar存在该文件 --> 检出该文件并暂存
             } else if (splitB == null && curB == null && tarB != null) {
                 // 检出文件
                 mergeCheckout(fileName, tarB.getContents());
                 // 暂存文件
                 bufferAdd.add(fileName, tarB.getContents());
-            // 5.split, tar不存在该文件，cur存在该文件 --> 原样保持
+                // 5.split, tar不存在该文件，cur存在该文件 --> 原样保持
             } else if (splitB == null && curB != null && tarB == null) {
-                // 原样保持
                 continue;
-            // 6.split, cur存在该文件，tar不存在该文件，且该文件在cur中未修改 --> 删除，并标记为未跟踪状态
+                // 6.split, cur存在该文件，tar不存在该文件，且该文件在cur中未修改 --> 删除，并标记为未跟踪状态
             } else if (splitB != null && curB != null && tarB == null
                     && curB.getContents() == splitB.getContents()) {
                 // 删除该文件
                 deleFile(fileName);
                 bufferRm.add(fileName);
-            // 7.split, tar存在该文件，cur不存在该文件，且该文件在cur中未修改 --> 保持原样
+                // 7.split, tar存在该文件，cur不存在该文件，且该文件在cur中未修改 --> 保持原样
             } else if (splitB != null && curB == null && tarB != null
                     && tarB.getContents() == splitB.getContents()) {
                 continue;
-            // 8.冲突状况, 全部递交给暂存区
-            // 8(1).split存在该文件，cur中该文件被修改，tar中该文件被删除
+                // 8.冲突状况, 全部递交给暂存区，8(1).split存在该文件，cur中该文件被修改，tar中该文件被删除
             } else if (splitB != null && curB != null && tarB == null
                     && curB.getContents() != splitB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), null);
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
-            // 8(2).split存在该文件，cur中该文件被删除，tar中该文件被修改
+                // 8(2).split存在该文件，cur中该文件被删除，tar中该文件被修改
             } else if (splitB != null && curB == null && tarB != null
                     && tarB.getContents() != splitB.getContents()) {
                 mergeFileContents(fileName, null, tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
-            // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
+                // 8(3).split存在该文件，cur, tar均修改该文件，且内容不一致
             } else if (splitB != null && curB != null && tarB != null
                     && tarB.getContents() != splitB.getContents()
-                    && curB.getContents() != splitB.getContents() && curB.getContents() != tarB.getContents()) {
+                    && curB.getContents() != splitB.getContents()
+                    && curB.getContents() != tarB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
-            // 8(4).split不存在该文件，cur, tar均添加该文件，且内容不一致
+                // 8(4).split不存在该文件，cur, tar均添加该文件，且内容不一致
             } else if (splitB == null && curB != null & tarB != null
                     && tarB.getContents() != curB.getContents()) {
                 mergeFileContents(fileName, curB.getContents(), tarB.getContents());
                 bufferAdd.add(fileName, Utils.readContents(join(CWD, fileName)));
                 isConflict = true;
             }
-            // 保存buffer，branch以便commit方法使用数据
-            bufferAdd.save();
-            bufferRm.save();
-            branch.save();
-            // 检查是否存在冲突
-            if (isConflict) {
-                System.out.println("Encountered a merge conflict.");
-            }
-            // 更新完毕，生成提交ing...
-            commit("Merged " + tarBranch + " into "
-                    + curBranch + ".", curBranchCommitID, tarBranchCommitID);
         }
+        // 保存buffer，branch以便commit方法使用数据
+        bufferAdd.save();
+        bufferRm.save();
+        return isConflict;
+    }
+
+    public static void merge(String tarBranch) {
+        Branch branch = Branch.readFromFile();
+        // 如果存在已暂存的添加或删除没有被提交：
+        if (stagedUncommitFail()) {
+            return;
+        }
+        // 如果给定的分支名称不存在, 输出错误信息:
+        if (tarBranchNotExist(branch, tarBranch)) {
+            return;
+        }
+        // 如果当前分支将于自身分支合并，输出错误信息
+        if (mergeItselfFail(branch, tarBranch)) {
+            return;
+        }
+        // 获取两个分支的最新提交，获取两分支的共同祖先
+        String curBranchCommitID = branch.getHEAD();
+        String tarBranchCommitID = branch.getTargetHead(tarBranch);
+        String splitCommitID = getSplitBranch(curBranchCommitID, tarBranchCommitID);
+        // 如果split为给定分支，不进行操作
+        if (tarBranchCommitID.equals(splitCommitID)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            return;
+        }
+        Commit curCommit = Commit.readFromFile(curBranchCommitID);
+        Commit tarCommit = Commit.readFromFile(tarBranchCommitID);
+        Commit splitCommit = Commit.readFromFile(splitCommitID);
+        // 如果split为当前分支，检出给定分支点，不改变当前分支
+        if (curBranchCommitID.equals(splitCommitID)) {
+            // 更新工作区, 参数为Commit
+            update(curCommit, tarCommit);
+            // 当前分支更新该提交
+            branch.updateCurBranchHead(tarBranchCommitID);
+            System.out.println("Current branch fast-forwarded.");
+            branch.save();
+            return;
+        }
+        // 获取四个映射 (allFiles, split, current, target)
+        HashSet<String> allFileSet = getAllFilesSet(splitCommit, curCommit, tarCommit);
+        HashMap<String, String> splitFilesMap = getFilesMapFromOne(splitCommit);
+        HashMap<String, String> curFilesMap = getFilesMapFromOne(curCommit);
+        HashMap<String, String> tarFilesMap = getFilesMapFromOne(tarCommit);
+        // 检查当前提交中的未跟踪文件是否会被此次merge覆盖或者删除
+        boolean UnstackedFail = isUnstackedFail(curCommit, curFilesMap, splitFilesMap, tarFilesMap);
+        if (UnstackedFail) {
+            return;
+        }
+        // 检查是否存在冲突
+        if (modifyOfMerge(allFileSet, splitFilesMap, curFilesMap, tarFilesMap)) {
+            System.out.println("Encountered a merge conflict.");
+        }
+        // 更新完毕，生成提交ing...
+        String curBranch = branch.getCurrentBranch();
+    commit("Merged " + tarBranch + " into "
+            + curBranch + ".", curBranchCommitID, tarBranchCommitID);
+    }
+
+    // m处理erge时存在已暂存的添加或删除操作未提交的错误
+    private static boolean stagedUncommitFail() {
+        BufferAdd bufferAdd = BufferAdd.readFromFile();
+        BufferRm bufferRm = BufferRm.readFromFile();
+        // 如果存在已暂存的添加或删除操作，输出错误信息：
+        if (bufferAdd.isEmpty() || bufferRm.isEmpty()) {
+            System.out.println("You have uncommitted changes.");
+            return true;
+        }
+        return false;
+    }
+
+    // 处理merge时分支名称不存在的错误
+    private static boolean tarBranchNotExist(Branch branch, String tarBranch) {
+        // 如果当前分支将于自身分支合并，输出错误信息
+        if (branch.branchIsContained(tarBranch)) {
+            System.out.println("A branch with that name does not exist.");
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean mergeItselfFail(Branch branch, String tarBranch) {
+        // 获取当前分支名称
+        String curBranch = branch.getCurrentBranch();
+        // 如果当前分支将于自身分支合并，输出错误信息
+        if (curBranch.equals(tarBranch)) {
+            System.out.println("Cannot merge a branch with itself.");
+            return true;
+        }
+        return false;
     }
 }
