@@ -640,7 +640,7 @@ public class Repository {
         contentsOfFile.append(curStr);
         contentsOfFile.append("=======" + "\n");
         contentsOfFile.append(tarStr);
-        contentsOfFile.append(">>>>>>>");
+        contentsOfFile.append(">>>>>>>" + "\n");
         Utils.writeContents(fileDir, contentsOfFile.toString());
     }
 
