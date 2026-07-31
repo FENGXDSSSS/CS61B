@@ -1,5 +1,5 @@
 <<<<<<< HEAD
 Another wug.
 =======
-This is a notwug.txt
+This is not a wug.
 >>>>>>>
