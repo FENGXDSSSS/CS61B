@@ -4,6 +4,8 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -14,7 +16,7 @@ public class RandomWorldDemo {
     private static final int HEIGHT = 50;
 
     private static final long SEED = 2873123;
-    private static final Random RANDOM = new Random(SEED);
+    private static final Random RANDOM = new Random(new Date().getTime());
 
     /**
      * Fills the given 2D array of tiles with RANDOM tiles.
